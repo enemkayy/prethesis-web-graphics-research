@@ -1,0 +1,18 @@
+# Unity build & temporary files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Visual Studio / VS Code temp files
+.vs/
+*.csproj
+*.sln
+*.unityproj
