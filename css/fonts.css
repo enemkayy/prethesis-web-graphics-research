@@ -1,0 +1,50 @@
+/* ==========================================================================
+   Typography: Self-Hosted Font Definitions
+   Font Families: IBM Plex Sans & IBM Plex Mono
+   License: SIL Open Font License 1.1 (see ../assets/fonts/LICENSE.txt)
+   ========================================================================== */
+
+/* IBM Plex Sans - Regular (400) */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/IBMPlexSans-Regular.woff2') format('woff2');
+}
+
+/* IBM Plex Sans - Medium (500) */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/IBMPlexSans-Medium.woff2') format('woff2');
+}
+
+/* IBM Plex Sans - SemiBold (600) */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/IBMPlexSans-SemiBold.woff2') format('woff2');
+}
+
+/* IBM Plex Mono - Regular (400) */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/IBMPlexMono-Regular.woff2') format('woff2');
+}
+
+/* IBM Plex Mono - Medium (500) */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/IBMPlexMono-Medium.woff2') format('woff2');
+}
