@@ -1,1 +1,166 @@
-<!-- Page embedding <model-viewer>. -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Module 04: AR/VR — Prototype Placeholder</title>
+    <link rel="stylesheet" href="../../css/fonts.css" />
+    <style>
+      :root {
+        --bg-canvas: #0d1626;
+        --bg-surface: #111c30;
+        --bg-tag: #16223a;
+        --border-subtle: #1c2a42;
+        --border-default: #263856;
+        --text-primary: #e6edf7;
+        --text-secondary: #a9b6cb;
+        --text-muted: #7d8ba3;
+        --module-accent: #3ccfa8;
+        --module-accent-bg: rgba(60, 207, 168, 0.14);
+        --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+        --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+        color-scheme: dark;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        min-height: 100dvh;
+        background-color: var(--bg-canvas);
+        color: var(--text-primary);
+        font-family: var(--font-sans);
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .placeholder-card {
+        width: 100%;
+        max-width: 640px;
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-default);
+        border-radius: 12px;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .placeholder-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .module-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 6px;
+        background-color: var(--module-accent-bg);
+        color: var(--module-accent);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1.4;
+        letter-spacing: 0.01em;
+      }
+
+      .status-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background-color: var(--bg-tag);
+        border: 1px solid var(--border-default);
+        color: var(--text-primary);
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1.4;
+        letter-spacing: 0.02em;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background-color: var(--module-accent);
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+      }
+
+      p {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        max-width: 60ch;
+      }
+
+      .tech-specs {
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-subtle);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        list-style: none;
+      }
+
+      .tech-tag {
+        padding: 8px 10px;
+        border-radius: 6px;
+        background-color: var(--bg-tag);
+        border: 1px solid var(--border-subtle);
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="placeholder-card" aria-labelledby="module-heading">
+      <div class="placeholder-meta">
+        <span class="module-badge">Module 04</span>
+        <span class="status-label">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Prototype placeholder</span>
+        </span>
+      </div>
+      <h1 id="module-heading">AR/VR</h1>
+      <p>
+        This standalone module document is reserved for the browser-based 3D
+        visualization and Extended Reality (XR) prototype. It will explore
+        Google &lt;model-viewer&gt; 1:1 scale Augmented Reality spatial
+        placement alongside a WebXR Virtual Reality compatibility and
+        feasibility investigation.
+      </p>
+      <ul class="tech-specs" aria-label="Planned technologies">
+        <li class="tech-tag">model-viewer</li>
+        <li class="tech-tag">WebXR Device API</li>
+      </ul>
+    </main>
+  </body>
+</html>
