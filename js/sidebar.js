@@ -1,6 +1,7 @@
 /**
- * Web Graphics Lab — Responsive Sidebar Drawer Controller
+ * Web Graphics Lab — Responsive Sidebar & Desktop Collapse Controller
  * Handles mobile/tablet off-canvas navigation drawer open/close states,
+ * desktop sidebar collapse/expand with localStorage persistence,
  * backdrop interaction, Escape key handling, and keyboard focus trapping.
  */
 
@@ -11,13 +12,90 @@
   const backdrop = document.getElementById("sidebar-backdrop");
   const openBtn = document.getElementById("menu-toggle-btn");
   const closeBtn = document.getElementById("sidebar-close-btn");
+  const collapseBtn = document.getElementById("sidebar-collapse-btn");
 
   if (!sidebar || !backdrop || !openBtn || !closeBtn) {
     return;
   }
 
   const tabletBreakpoint = window.matchMedia("(max-width: 1023px)");
+  const STORAGE_KEY = "grh_sidebar_collapsed";
   let isOpen = false;
+
+  /**
+   * Reads the stored desktop sidebar collapse state from localStorage.
+   * @returns {boolean}
+   */
+  function getStoredCollapseState() {
+    try {
+      return localStorage.getItem(STORAGE_KEY) === "true";
+    } catch (_err) {
+      return false;
+    }
+  }
+
+  /**
+   * Persists the desktop sidebar collapse state to localStorage.
+   * @param {boolean} isCollapsed
+   */
+  function setStoredCollapseState(isCollapsed) {
+    try {
+      localStorage.setItem(STORAGE_KEY, isCollapsed ? "true" : "false");
+    } catch (_err) {
+      // Gracefully ignore storage exceptions (e.g. sandboxed iframe/storage blocked)
+    }
+  }
+
+  /**
+   * Updates the desktop collapse button attributes and icon visibility.
+   * @param {boolean} isCollapsed
+   */
+  function updateCollapseButtonState(isCollapsed) {
+    if (!collapseBtn) {
+      return;
+    }
+    collapseBtn.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+    const nextActionLabel = isCollapsed ? "Expand sidebar" : "Collapse sidebar";
+    collapseBtn.setAttribute("aria-label", nextActionLabel);
+    collapseBtn.setAttribute("title", nextActionLabel);
+
+    const iconCollapse = collapseBtn.querySelector(".icon-collapse");
+    const iconExpand = collapseBtn.querySelector(".icon-expand");
+    if (iconCollapse && iconExpand) {
+      if (isCollapsed) {
+        iconCollapse.setAttribute("hidden", "");
+        iconExpand.removeAttribute("hidden");
+      } else {
+        iconCollapse.removeAttribute("hidden");
+        iconExpand.setAttribute("hidden", "");
+      }
+    }
+  }
+
+  /**
+   * Applies the desktop collapse state to document.body and updates controls.
+   * @param {boolean} isCollapsed
+   * @param {boolean} persist
+   */
+  function setDesktopCollapse(isCollapsed, persist) {
+    document.body.classList.toggle("is-sidebar-collapsed", isCollapsed);
+    updateCollapseButtonState(isCollapsed);
+    if (persist) {
+      setStoredCollapseState(isCollapsed);
+    }
+  }
+
+  /**
+   * Toggles the desktop sidebar between expanded and collapsed states.
+   */
+  function toggleDesktopSidebar() {
+    if (tabletBreakpoint.matches) {
+      return;
+    }
+    const isCurrentlyCollapsed =
+      document.body.classList.contains("is-sidebar-collapsed");
+    setDesktopCollapse(!isCurrentlyCollapsed, true);
+  }
 
   /**
    * Returns all visible, focusable elements inside the sidebar.
@@ -160,10 +238,27 @@
   sidebar.addEventListener("click", handleSidebarClick);
   document.addEventListener("keydown", handleKeyDown);
 
-  // Reset mobile drawer state if viewport expands to desktop width
+  if (collapseBtn) {
+    collapseBtn.addEventListener("click", toggleDesktopSidebar);
+  }
+
+  // Restore desktop collapsed preference on initial load
+  if (!tabletBreakpoint.matches && getStoredCollapseState()) {
+    setDesktopCollapse(true, false);
+  }
+
+  // Handle breakpoint transitions between desktop and tablet/mobile
   tabletBreakpoint.addEventListener("change", (event) => {
-    if (!event.matches && isOpen) {
-      closeDrawer({ restoreFocus: false });
+    if (!event.matches) {
+      // Expanding to desktop: close mobile drawer if open, and restore desktop collapse preference
+      if (isOpen) {
+        closeDrawer({ restoreFocus: false });
+      }
+      if (getStoredCollapseState()) {
+        setDesktopCollapse(true, false);
+      } else {
+        setDesktopCollapse(false, false);
+      }
     }
   });
 })();
