@@ -32,6 +32,8 @@
 - [x] Create placeholder pages for the four modules.
 - [x] Ensure responsive layout across desktop, tablet, and mobile breakpoints.
 - [x] Verify relative paths and local resource loading under static hosting.
+- [x] Implement desktop collapsible sidebar with accessible icon-only navigation.
+
 
 ## Phase 3 – Module 1: WebGL Graphics
 

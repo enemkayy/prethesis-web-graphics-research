@@ -38,6 +38,7 @@
             href="#/"
             class="brand-link"
             aria-label="Graphics Research Hub Overview"
+            title="Graphics Research Hub Overview"
           >
             <svg
               class="brand-mark"
@@ -82,6 +83,51 @@
             <span class="brand-title">Graphics Research Hub</span>
           </a>
 
+          <button
+            type="button"
+            class="button-icon sidebar-collapse-btn"
+            id="sidebar-collapse-btn"
+            aria-label="Collapse sidebar"
+            aria-expanded="true"
+            aria-controls="sidebar"
+            title="Collapse sidebar"
+          >
+            <svg
+              class="icon icon-collapse"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <polyline
+                points="12,5 7,10 12,15"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <svg
+              class="icon icon-expand"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              hidden
+            >
+              <polyline
+                points="8,5 13,10 8,15"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
           <button
             type="button"
             class="button-icon sidebar-close-btn"
@@ -129,6 +175,7 @@
                   class="nav-item is-active"
                   aria-current="page"
                   data-nav-route="#/"
+                  title="Overview"
                 >
                   <svg
                     class="nav-icon"
@@ -189,7 +236,7 @@
             <div class="nav-group-label" id="nav-group-modules">Modules</div>
             <ul class="nav-list" aria-labelledby="nav-group-modules">
               <li>
-                <a href="#/module1" class="nav-item" data-nav-route="#/module1">
+                <a href="#/module1" class="nav-item" data-nav-route="#/module1" title="WebGL Graphics">
                   <svg
                     class="nav-icon"
                     width="20"
@@ -225,7 +272,7 @@
                 </a>
               </li>
               <li>
-                <a href="#/module2" class="nav-item" data-nav-route="#/module2">
+                <a href="#/module2" class="nav-item" data-nav-route="#/module2" title="Graphical Applications">
                   <svg
                     class="nav-icon"
                     width="20"
@@ -267,7 +314,7 @@
                 </a>
               </li>
               <li>
-                <a href="#/module3" class="nav-item" data-nav-route="#/module3">
+                <a href="#/module3" class="nav-item" data-nav-route="#/module3" title="Web Games">
                   <svg
                     class="nav-icon"
                     width="20"
@@ -308,7 +355,7 @@
                 </a>
               </li>
               <li>
-                <a href="#/module4" class="nav-item" data-nav-route="#/module4">
+                <a href="#/module4" class="nav-item" data-nav-route="#/module4" title="AR/VR">
                   <svg
                     class="nav-icon"
                     width="20"
@@ -354,7 +401,7 @@
               aria-label="Platform documentation and details"
             >
               <li>
-                <a href="#/docs" class="nav-item" data-nav-route="#/docs">
+                <a href="#/docs" class="nav-item" data-nav-route="#/docs" title="Documentation">
                   <svg
                     class="nav-icon"
                     width="20"
@@ -381,7 +428,7 @@
                 </a>
               </li>
               <li>
-                <a href="#/about" class="nav-item" data-nav-route="#/about">
+                <a href="#/about" class="nav-item" data-nav-route="#/about" title="About">
                   <svg
                     class="nav-icon"
                     width="20"
@@ -424,6 +471,7 @@
           <a
             href="https://github.com/enemkayy/prethesis-web-graphics-research"
             class="project-repo-link"
+            title="GitHub Repository"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -555,17 +603,13 @@
                 class="icon"
                 width="20"
                 height="20"
-                viewBox="0 0 20 20"
-                fill="none"
+                viewBox="0 0 16 16"
+                fill="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
               >
                 <path
-                  d="M10 2.2C5.58 2.2 2 5.82 2 10.28C2 13.85 4.29 16.88 7.47 17.95C7.87 18.02 8.02 17.78 8.02 17.57V16.12C5.8 16.61 5.33 15.04 5.33 15.04C4.97 14.11 4.44 13.86 4.44 13.86C3.72 13.36 4.5 13.37 4.5 13.37C5.3 13.43 5.72 14.2 5.72 14.2C6.43 15.43 7.59 15.08 8.05 14.87C8.12 14.35 8.33 13.99 8.56 13.79C6.78 13.59 4.91 12.89 4.91 9.8C4.91 8.91 5.22 8.19 5.74 7.62C5.66 7.42 5.38 6.6 5.82 5.5C5.82 5.5 6.49 5.28 8.02 6.33C8.66 6.15 9.33 6.06 10 6.06C10.67 6.06 11.34 6.15 11.98 6.33C13.51 5.28 14.18 5.5 14.18 5.5C14.62 6.6 14.34 7.42 14.26 7.62C14.78 8.19 15.09 8.91 15.09 9.8C15.09 12.9 13.22 13.58 11.43 13.78C11.72 14.03 11.98 14.53 11.98 15.3V17.57C11.98 17.78 12.13 18.03 12.53 17.95C15.71 16.88 18 13.85 18 10.28C18 5.82 14.42 2.2 10 2.2Z"
-                  stroke="currentColor"
-                  stroke-width="1.4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"
                 />
               </svg>
             </a>
@@ -1344,9 +1388,7 @@
                     </svg>
                     <div class="footer-group-text">
                       <dt class="footer-label">Platform</dt>
-                      <dd class="footer-value">
-                        Graphics Research Hub · Pre-thesis research project
-                      </dd>
+                      <dd class="footer-value">Pre-thesis Research Project</dd>
                     </div>
                   </div>
 
@@ -1386,10 +1428,7 @@
                     </svg>
                     <div class="footer-group-text">
                       <dt class="footer-label">Technologies</dt>
-                      <dd class="footer-value">
-                        HTML5 · CSS3 · JavaScript · WebGL · Unity · C# ·
-                        model-viewer · WebXR
-                      </dd>
+                      <dd class="footer-value">WebGL · Unity · WebXR</dd>
                     </div>
                   </div>
 
@@ -1434,9 +1473,6 @@
                   </div>
                 </dl>
 
-                <p class="footer-caption">
-                  Pre-thesis Web Graphics Research Platform
-                </p>
               </footer>
             </div>
 
