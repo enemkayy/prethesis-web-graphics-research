@@ -613,3 +613,33 @@ body {
     padding: 6px 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .control-panel {
+    padding: 6px 8px;
+    gap: 6px 8px;
+  }
+
+  .control-group {
+    gap: 6px;
+  }
+
+  .control-toggle {
+    padding: 4px 8px;
+  }
+
+  .control-slider {
+    width: 76px;
+  }
+
+  .control-select {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+  }
+
+  .control-btn {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+}
+
