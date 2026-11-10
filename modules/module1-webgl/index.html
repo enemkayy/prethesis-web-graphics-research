@@ -3,165 +3,323 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Module 01: WebGL Graphics — Prototype Placeholder</title>
+    <title>Module 01: WebGL Graphics — Task 3.4 Animation &amp; Interactive Controls</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Crect width='32' height='32' rx='6' fill='%230B1220'/%3E%3Cpolygon points='16,4 27,10.5 27,21.5 16,28 5,21.5 5,10.5' stroke='%235B93FF' stroke-width='2' stroke-linejoin='round'/%3E%3Cpolyline points='5,10.5 16,17 27,10.5' stroke='%2338C6D9' stroke-width='2' stroke-linejoin='round'/%3E%3Cline x1='16' y1='17' x2='16' y2='28' stroke='%2338C6D9' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
     <link rel="stylesheet" href="../../css/fonts.css" />
-    <style>
-      :root {
-        --bg-canvas: #0d1626;
-        --bg-surface: #111c30;
-        --bg-tag: #16223a;
-        --border-subtle: #1c2a42;
-        --border-default: #263856;
-        --text-primary: #e6edf7;
-        --text-secondary: #a9b6cb;
-        --text-muted: #7d8ba3;
-        --module-accent: #5b93ff;
-        --module-accent-bg: rgba(91, 147, 255, 0.14);
-        --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-        --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
-        color-scheme: dark;
-      }
-
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      html,
-      body {
-        min-height: 100dvh;
-        background-color: var(--bg-canvas);
-        color: var(--text-primary);
-        font-family: var(--font-sans);
-        font-size: 16px;
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-      }
-
-      body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-      }
-
-      .placeholder-card {
-        width: 100%;
-        max-width: 640px;
-        background-color: var(--bg-surface);
-        border: 1px solid var(--border-default);
-        border-radius: 12px;
-        padding: 32px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .placeholder-meta {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .module-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 10px;
-        border-radius: 6px;
-        background-color: var(--module-accent-bg);
-        color: var(--module-accent);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        font-weight: 500;
-        line-height: 1.4;
-        letter-spacing: 0.01em;
-      }
-
-      .status-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background-color: var(--bg-tag);
-        border: 1px solid var(--border-default);
-        color: var(--text-primary);
-        font-size: 0.75rem;
-        font-weight: 500;
-        line-height: 1.4;
-        letter-spacing: 0.02em;
-      }
-
-      .status-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 999px;
-        background-color: var(--module-accent);
-      }
-
-      h1 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        line-height: 1.25;
-        letter-spacing: -0.01em;
-        color: var(--text-primary);
-      }
-
-      p {
-        font-size: 1rem;
-        color: var(--text-secondary);
-        max-width: 60ch;
-      }
-
-      .tech-specs {
-        margin-top: 8px;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-subtle);
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        list-style: none;
-      }
-
-      .tech-tag {
-        padding: 8px 10px;
-        border-radius: 6px;
-        background-color: var(--bg-tag);
-        border: 1px solid var(--border-subtle);
-        color: var(--text-secondary);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        font-weight: 500;
-        line-height: 1.4;
-      }
-    </style>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main class="placeholder-card" aria-labelledby="module-heading">
-      <div class="placeholder-meta">
-        <span class="module-badge">Module 01</span>
-        <span class="status-label">
-          <span class="status-dot" aria-hidden="true"></span>
-          <span>Prototype placeholder</span>
-        </span>
+    <main class="module-shell" aria-labelledby="module-title">
+      <!-- Top Instrument & Telemetry Bar (Diagnostics for Tasks 3.1 – 3.4) -->
+      <header class="instrument-bar">
+        <div class="instrument-identity">
+          <span class="module-badge">Module 01 · Task 3.4</span>
+          <h1 class="instrument-title" id="module-title">
+            3D Cube Animation, MVP Matrices &amp; Interactive Controls
+          </h1>
+        </div>
+
+        <ul class="telemetry-list" aria-label="WebGL runtime diagnostics">
+          <li>
+            <span
+              class="status-pill"
+              id="status-pill"
+              data-state="active"
+              role="status"
+              aria-live="polite"
+            >
+              <span class="status-dot" aria-hidden="true"></span>
+              <span id="status-text">Initializing…</span>
+            </span>
+          </li>
+          <li class="telemetry-item" title="Canvas CSS layout dimensions in CSS pixels">
+            <span class="telemetry-label">CSS Size:</span>
+            <span class="telemetry-value" id="telemetry-css-size">0 × 0 px</span>
+          </li>
+          <li
+            class="telemetry-item"
+            title="WebGL GPU drawing-buffer dimensions in physical pixels"
+          >
+            <span class="telemetry-label">Drawing Buffer:</span>
+            <span class="telemetry-value" id="telemetry-buffer-size">0 × 0 px</span>
+          </li>
+          <li
+            class="telemetry-item"
+            title="Effective Device Pixel Ratio applied to drawing buffer"
+          >
+            <span class="telemetry-label">DPR:</span>
+            <span class="telemetry-value" id="telemetry-dpr">1.00×</span>
+          </li>
+          <li
+            class="telemetry-item"
+            title="Active mesh vertex count, EBO index count, and VBO stride"
+          >
+            <span class="telemetry-label">Geometry:</span>
+            <span class="telemetry-value" id="telemetry-geometry">
+              24 verts · 36 idx · 24B
+            </span>
+          </li>
+          <li
+            class="telemetry-item"
+            title="Current Euler rotation angles (rx, ry, rz) in degrees"
+          >
+            <span class="telemetry-label">Rotation:</span>
+            <span class="telemetry-value" id="telemetry-rotation">
+              (18°, -28°, 0°)
+            </span>
+          </li>
+          <li
+            class="telemetry-item"
+            title="Perspective projection vertical FOV and drawing-buffer aspect ratio"
+          >
+            <span class="telemetry-label">Camera:</span>
+            <span class="telemetry-value" id="telemetry-camera">
+              FOV 45° · Aspect 1.00
+            </span>
+          </li>
+          <li class="telemetry-item" title="Configured RGBA framebuffer clear color">
+            <span class="telemetry-label">Clear RGBA:</span>
+            <span class="telemetry-value" id="telemetry-clear-color">
+              (0.06, 0.11, 0.20, 1.00)
+            </span>
+          </li>
+          <li class="telemetry-item" title="Active requestAnimationFrame loop counter">
+            <span class="telemetry-label">Frames:</span>
+            <span class="telemetry-value" id="telemetry-frames">0</span>
+          </li>
+        </ul>
+      </header>
+
+      <!-- Task 3.4 Compact Interactive Control Strip -->
+      <section
+        class="control-panel"
+        id="control-panel"
+        aria-label="3D animation and object controls"
+      >
+        <!-- A. Auto-Rotate Toggle -->
+        <div class="control-group">
+          <label class="control-toggle" for="control-auto-rotate">
+            <input
+              type="checkbox"
+              id="control-auto-rotate"
+              class="control-checkbox"
+              checked
+            />
+            <span class="control-toggle-text">Auto-Rotate</span>
+            <span class="control-state-chip" id="control-auto-rotate-state">
+              On
+            </span>
+          </label>
+        </div>
+
+        <span class="control-divider" aria-hidden="true"></span>
+
+        <!-- B. Rotation Speed Slider (Degrees / Second) -->
+        <div class="control-group control-group--slider">
+          <label class="control-label" for="control-rotation-speed">
+            Speed
+          </label>
+          <input
+            type="range"
+            id="control-rotation-speed"
+            class="control-slider"
+            min="0"
+            max="180"
+            step="1"
+            value="45"
+            aria-describedby="control-speed-value"
+          />
+          <output
+            class="control-output"
+            id="control-speed-value"
+            for="control-rotation-speed"
+          >
+            45°/s
+          </output>
+        </div>
+
+        <span class="control-divider" aria-hidden="true"></span>
+
+        <!-- C. Object Vertex Color Control (VBO gl.bufferSubData update) -->
+        <div class="control-group">
+          <label class="control-label" for="control-color-target">
+            Face Target
+          </label>
+          <select
+            id="control-color-target"
+            class="control-select"
+            aria-label="Select cube face or all faces for color update"
+          >
+            <option value="all" selected>All 6 Faces</option>
+            <option value="0">Front (+Z)</option>
+            <option value="1">Back (-Z)</option>
+            <option value="2">Top (+Y)</option>
+            <option value="3">Bottom (-Y)</option>
+            <option value="4">Right (+X)</option>
+            <option value="5">Left (-X)</option>
+          </select>
+
+          <label class="control-label" for="control-object-color">
+            Color
+          </label>
+          <input
+            type="color"
+            id="control-object-color"
+            class="control-color-input"
+            value="#5c94ff"
+            aria-label="Cube vertex color picker"
+          />
+
+          <button
+            type="button"
+            id="control-color-palette"
+            class="control-btn control-btn--compact"
+            title="Restore the default 6-face scientific color palette in the VBO"
+          >
+            6-Face Palette
+          </button>
+        </div>
+
+        <span class="control-divider" aria-hidden="true"></span>
+
+        <!-- D. Pause / Resume Rendering & E. Reset to Defaults -->
+        <div class="control-group control-group--actions">
+          <button
+            type="button"
+            id="control-pause-resume"
+            class="control-btn"
+            aria-pressed="false"
+          >
+            Pause Rendering
+          </button>
+          <button
+            type="button"
+            id="control-reset"
+            class="control-btn"
+          >
+            Reset Defaults
+          </button>
+        </div>
+      </section>
+
+      <!-- Responsive WebGL Canvas Stage -->
+      <div class="canvas-stage" id="canvas-stage">
+        <canvas
+          id="webgl-canvas"
+          class="webgl-canvas"
+          tabindex="0"
+          role="img"
+          aria-label="WebGL 2.0 3D rendering surface displaying an animated indexed 6-face colored 3D cube with interactive rotation speed, color, and lifecycle controls."
+        >
+          Your browser does not support the HTML5 canvas element or WebGL 2.0
+          rendering context required for this graphics prototype.
+        </canvas>
+
+        <!-- Stage Verification Caption -->
+        <div class="stage-caption" id="stage-caption" aria-hidden="true">
+          <span class="stage-caption-title" id="stage-caption-title">
+            GLSL ES 3.00 3D Pipeline · VAO + VBO (24v) + EBO (Uint16Array 36i)
+          </span>
+          <span class="stage-caption-text" id="stage-caption-text">
+            Delta-Time Animation (Δθ = ω · Δt) · MVP Uniforms + VBO gl.bufferSubData()
+          </span>
+        </div>
+
+        <!-- Shader / Program Compilation Diagnostic Overlay -->
+        <div
+          class="stage-overlay"
+          id="shader-error-overlay"
+          role="alert"
+          aria-live="assertive"
+          hidden
+        >
+          <div class="overlay-card overlay-card--danger">
+            <span class="overlay-badge overlay-badge--danger">
+              GLSL Pipeline Error
+            </span>
+            <h2 class="overlay-title">
+              Shader Compilation or Program Linking Failed
+            </h2>
+            <p class="overlay-description">
+              The GPU driver rejected the GLSL ES 3.00 shader source or program
+              link step. Rendering has been halted safely and partially created
+              GPU resources were released.
+            </p>
+            <pre class="overlay-log" id="shader-error-log"></pre>
+          </div>
+        </div>
+
+        <!-- Context Loss Notification Overlay -->
+        <div
+          class="stage-overlay"
+          id="context-lost-overlay"
+          role="status"
+          aria-live="assertive"
+          hidden
+        >
+          <div class="overlay-card overlay-card--warning">
+            <span class="overlay-badge overlay-badge--warning">
+              webglcontextlost
+            </span>
+            <h2 class="overlay-title">WebGL 2.0 Rendering Context Lost</h2>
+            <p class="overlay-description">
+              The GPU rendering context was interrupted (due to a GPU driver
+              reset, system sleep, background resource reclamation, or manual
+              simulation). The animation loop has been paused safely, and the
+              application is waiting for the browser to fire
+              <code class="overlay-code">webglcontextrestored</code> to rebuild
+              shaders, VBO, EBO, and VAO resources.
+            </p>
+          </div>
+        </div>
+
+        <!-- Unsupported WebGL 2.0 Fallback Overlay -->
+        <div
+          class="stage-overlay"
+          id="webgl-fallback"
+          role="alert"
+          aria-live="assertive"
+          hidden
+        >
+          <div class="overlay-card overlay-card--danger">
+            <span class="overlay-badge overlay-badge--danger">
+              WebGL 2.0 Unavailable
+            </span>
+            <h2 class="overlay-title">
+              Unable to Initialize WebGL 2.0 Rendering Context
+            </h2>
+            <p class="overlay-description" id="fallback-reason">
+              This prototype requires a native
+              <code class="overlay-code">WebGL2RenderingContext</code> (OpenGL
+              ES 3.0 for the Web), which could not be created in your current
+              browser environment.
+            </p>
+            <ul class="overlay-checklist">
+              <li>
+                Verify that you are using a modern browser with WebGL 2.0
+                support (Chrome, Edge, Firefox, or Safari 15+).
+              </li>
+              <li>
+                Ensure hardware acceleration is enabled in your browser settings.
+              </li>
+              <li>
+                If testing fallback simulation via
+                <code class="overlay-code">?webgl=unsupported</code>, remove the
+                query parameter to restore normal WebGL 2.0 initialization.
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <h1 id="module-heading">WebGL Graphics</h1>
-      <p>
-        This standalone module document is reserved for the native WebGL 2.0
-        proof-of-concept prototype. It will explore browser-based 3D geometry
-        rendering, custom GLSL ES 3.0 vertex and fragment shaders, matrix
-        transformations, and interactive scene controls without external 3D
-        libraries.
-      </p>
-      <ul class="tech-specs" aria-label="Planned technologies">
-        <li class="tech-tag">Vanilla JavaScript</li>
-        <li class="tech-tag">WebGL 2.0</li>
-        <li class="tech-tag">GLSL ES 3.0</li>
-      </ul>
     </main>
+
+    <script src="./js/math.js"></script>
+    <script src="./js/shaders.js"></script>
+    <script src="./js/geometry.js"></script>
+    <script src="./js/main.js"></script>
   </body>
 </html>

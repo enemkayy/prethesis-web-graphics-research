@@ -72,11 +72,17 @@
 - Do not introduce backend services, databases, or unnecessary NPM packages.
 - Use external libraries only when explicitly required by the module specification or approved by the user.
 
-### 3.4. Code Quality
+### 3.4. Code Quality & Educational Comments
 
-- Write readable, modular, and beginner-friendly code.
-- Use meaningful variable and function names.
-- Add comments to explain non-obvious logic, important mathematical operations, graphics pipelines, and complex interactions.
+- Write readable, modular, and beginner-friendly code. Prefer clarity over cleverness or premature optimization.
+- Use meaningful variable and function names and keep functions focused on one clear responsibility.
+- **Prioritize educational comments in source code**, especially for WebGL, GLSL shaders, 3D mathematics, Unity/C#, physics, raycasting, and WebXR concepts.
+- At the beginning of a non-trivial function, explain its purpose, inputs, outputs (if any), important side effects, and role in the execution flow.
+- Before non-obvious code blocks, explain **why the logic is necessary**, not merely what the next statement does.
+- Comment important graphics APIs, coordinate systems, matrix conventions, units, buffer layouts, shader inputs/outputs, lifecycle events, and error-handling decisions.
+- For mathematical formulas or transformations, explain what each value represents and the expected visual effect when relevant.
+- Keep comments close to the code they explain, accurate after refactoring, and written in clear English.
+- Do not comment every trivial statement, repeat obvious code, or add verbose comments that obscure the implementation.
 - Avoid unnecessary abstractions and over-engineering.
 - Follow the existing coding style and project structure.
 
@@ -107,8 +113,9 @@ Before starting a development task:
 2. Modify only files necessary for the requested task.
 3. Preserve existing functionality.
 4. Keep the implementation simple and appropriate for the project's research scope.
-5. Explain important technical decisions when appropriate.
-6. Avoid modifying unrelated modules or documentation.
+5. Explain important technical decisions and research concepts, especially when introducing a new graphics API or technique.
+6. Add meaningful educational source-code comments as required by Section 3.4.
+7. Avoid modifying unrelated modules or documentation.
 
 ### 4.3. Task Progress Tracking
 
@@ -134,6 +141,23 @@ After completing a task:
 5. Explain the implementation and important technical decisions.
 6. Report actual testing results and remaining issues.
 7. Do not claim that tests or manual checks were performed if they were not.
+
+### 4.5. Research-Oriented Development & Mentoring
+
+This is an academic **Pre-thesis research and learning project**, not merely a software delivery project. AI agents must act as both software engineers and technical research mentors. Assume the student is learning the specific graphics technology for the first time.
+
+For each substantive graphics implementation task:
+
+1. **Research first:** Explain the relevant theory, core terms, and learning objectives before writing code. Distinguish what the current task demonstrates from topics reserved for future tasks.
+2. **Implement incrementally:** Use small, verifiable steps with minimal dependencies. Do not introduce a large black-box implementation without explanation.
+3. **Explain the actual code:** Reference the real files, functions, and relevant line ranges. For important functions and APIs, explain their purpose, inputs/outputs, side effects, execution order, and relationship to Computer Graphics concepts.
+4. **Explain why:** Discuss the rationale for major design decisions, the consequences of omitting key logic, and relevant trade-offs or limitations.
+5. **Document runtime flow:** Trace how the application initializes, processes data or input, renders output, and responds to relevant events. Distinguish one-time initialization from per-frame operations.
+6. **Verify and investigate:** Run relevant tests when possible; explain what each test checks and report only observed results. Provide small, safe, reproducible hands-on experiments, including expected outcomes and their reasons.
+7. **Support learning:** End with concise conceptual questions and a separate answer key. Identify concepts to study before the next task.
+8. **Record research findings:** For module research tasks, maintain concise notes under `docs/research/` when requested or when the task explicitly calls for research documentation. Include objectives, key concepts, tested observations, limitations, and remaining questions. Do not invent measured results or scholarly references.
+
+Favor clear explanations and commented code over delivering features quickly. However, avoid explaining every trivial HTML tag or punctuation mark; focus on the concepts that help the student understand and maintain the implementation.
 
 ## 5. Final Task Report
 
@@ -165,3 +189,23 @@ After completing each development task, provide a summary using the following st
 - Identify the tasks updated in `TASKS.md`.
 - State their final status.
 - Mention any tasks that remain incomplete or blocked.
+
+### 5.6. Code Walkthrough (Required for Implementation Tasks)
+
+- Reference actual source files, functions, and line ranges (verify that references match the final code).
+- Explain key logic, APIs, mathematics, execution flow, and important commented sections.
+- For non-trivial functions, describe their inputs, outputs, side effects, and why they are needed.
+- Distinguish code already implemented from functionality planned for later tasks.
+
+### 5.7. Hands-on Experiments (Required for Research Modules)
+
+- Provide a few small, safe experiments the student can run locally to observe and understand the behavior.
+- State the action, expected result, and underlying technical explanation.
+- Clearly separate suggested experiments from tests actually executed by the agent.
+- Do not leave debugging or experimental changes in production code without approval.
+
+### 5.8. Knowledge Check (Required for Research Modules)
+
+- Provide 3–5 short conceptual questions based on the implemented code.
+- Include a separate answer key so the student can self-check after attempting the questions.
+- Note the essential concepts to understand before proceeding to the next task.
