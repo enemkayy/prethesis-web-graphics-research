@@ -16,6 +16,7 @@ Tasks 3.1–3.3 established the WebGL 2.0 context lifecycle, programmable GLSL E
 4. Why **Animation State** (`autoRotate`, `rotationSpeedDegPerSec`) and **Rendering State** (`isRunning`, `shouldRunWhenActive`) represent two distinct lifecycle dimensions.
 5. How lightweight, accessible DOM controls update application state and why modifying per-vertex attributes (`a_color` in the VBO) requires `gl.bufferSubData()` rather than a shader uniform update.
 6. How tab visibility transitions, manual rendering pauses, and WebGL context loss/restoration (`webglcontextlost` / `webglcontextrestored`) preserve user state and avoid delta-time jumps.
+7. How GPU resource reconstruction failures during reset or mesh-mode switching are contained gracefully without running headless loops or abandoning user diagnostics.
 
 ---
 
@@ -29,13 +30,13 @@ Modern browsers synchronize visual updates with the display's hardware vertical 
   If code increments `ryDeg += 0.75°` on every frame callback, a `60 Hz` monitor rotates the cube at $60 \times 0.75^\circ = 45^\circ/\text{s}$, whereas a `120 Hz` monitor rotates it at $120 \times 0.75^\circ = 90^\circ/\text{s}$ (twice as fast) and a `144 Hz` monitor rotates it at $108^\circ/\text{s}$.
 - **Time-Based Animation (`deltaTime`):**
   $$\Delta t = \frac{t_n - t_{n-1}}{1000}, \quad \theta_n = \theta_{n-1} + \omega \cdot \Delta t$$
-  where $\omega$ is the angular velocity in **degrees per second** (`rotationSpeedDegPerSec`, defaulting to $45^\circ/\text{s}$) and $\Delta t$ is the elapsed time in seconds. On a `60 Hz` display ($\Delta t \approx 0.01667\text{ s}$), each frame advances by $45 \times 0.01667 \approx 0.75^\circ$; on a `120 Hz` display ($\Delta t \approx 0.00833\text{ s}$), each frame advances by $45 \times 0.00833 \approx 0.375^\circ$. Across 1 full second of real wall-clock time, both displays rotate the cube by exactly $45^\circ$.
+  where $\omega$ is the angular velocity in **degrees per second** (`rotationSpeedDegPerSec`, defaulting to $45^\circ/\text{s}$) and $\Delta t$ is the elapsed time in seconds. Under normal operating conditions, time-based animation is **approximately frame-rate-independent** (subject only to IEEE 754 floating-point rounding precision and minor browser compositor timer jitter). On a `60 Hz` display ($\Delta t \approx 0.01667\text{ s}$), each frame advances by $45 \times 0.01667 \approx 0.75^\circ$; on a `120 Hz` display ($\Delta t \approx 0.00833\text{ s}$), each frame advances by $45 \times 0.00833 \approx 0.375^\circ$. Across 1 full second of uninterrupted wall-clock time, both displays rotate the cube by approximately $45^\circ$.
 
 ---
 
 ## 3. Delta-Time Computation, Clamping Policy, and Baseline Reset
 
-In `modules/module1-webgl/js/main.js` (`renderFrame(timestampMs)`, lines 1040–1092):
+In `modules/module1-webgl/js/main.js` (`renderFrame(timestampMs)`, lines 1048–1100):
 
 1. **Elapsed Time Calculation:**
    ```javascript
@@ -57,7 +58,7 @@ In `modules/module1-webgl/js/main.js` (`renderFrame(timestampMs)`, lines 1040–
    );
    ```
    - **Why Clamping Is Necessary:** When a user switches browser tabs, minimizes the window, or experiences a main-thread stall, `requestAnimationFrame` callbacks are suspended or throttled by the browser. Without clamping, the first frame after a 5-second suspension would compute `rawDeltaSeconds = 5.0 s` and jump the cube by $45^\circ/\text{s} \times 5.0\text{ s} = 225^\circ$ in a single frame.
-   - **Trade-off of Clamping at `0.1 s` (10 FPS floor):** For normal display rates (`30 Hz` to `240 Hz`, where $\Delta t \in [0.004\text{ s}, 0.033\text{ s}]$), the clamp is completely inactive and rotation is 100% wall-clock accurate. Only when the frame rate drops below `10 FPS` ($\Delta t > 0.1\text{ s}$) does the simulation slow down gracefully rather than teleporting the object across a large angle.
+   - **Deliberate Trade-off of Clamping at `0.1 s` (10 FPS floor):** Clamping intentionally sacrifices exact wall-clock progression during severe stalls (such as tab inactive suspension, prolonged garbage collection pauses, or main-thread blockages). For normal display rates (`30 Hz` to `240 Hz`, where $\Delta t \in [0.004\text{ s}, 0.033\text{ s}]$), the clamp is completely inactive and rotation closely tracks wall-clock time. However, when a severe stall occurs ($\Delta t > 0.1\text{ s}$), the simulation intentionally runs slower than the external wall clock for that frame, prioritizing visual stability and preventing disorienting angular teleportation over strict wall-clock synchronization.
 3. **Timing Baseline Reset (`resetAnimationTimeBaseline()`):**
    Whenever the loop starts or resumes (`startRenderLoop()`), when `autoRotate` is toggled from `Off` to `On`, when `document.visibilityState` returns to `"visible"`, or when `webglcontextrestored` / `pageshow` fires, `state.lastFrameTimeMs` is reset to `null`. Consequently, the very first frame after resumption establishes a fresh timestamp baseline with `deltaTimeSeconds = 0.0`, guaranteeing zero angular jump.
 
@@ -77,7 +78,10 @@ Module 1 strictly separates two orthogonal concepts:
 | Dimension | State Properties | UI Control | Effect When Disabled / Paused |
 | :--- | :--- | :--- | :--- |
 | **Animation State** | `state.autoRotate`<br>`state.rotationSpeedDegPerSec` | `#control-auto-rotate` (`On`/`Off`)<br>`#control-rotation-speed` (`0..180°/s`) | Stops automatic per-frame changes to `rotationDeg[1]`. The `requestAnimationFrame` loop **continues running**, so interactive DevTools or camera/transform updates still render continuously. |
-| **Rendering State** | `state.isRunning`<br>`state.shouldRunWhenActive`<br>`state.animationFrameId` | `#control-pause-resume`<br>(`Pause Rendering` / `Resume Rendering`) | Cancels `requestAnimationFrame` scheduling (`animationFrameId = null`), reducing continuous per-frame CPU/GPU work to zero while preserving all model, speed, and color state. Explicit one-shot redraws (`drawScene()`) still execute on resize, color change, or reset without restarting the loop. |
+| **Rendering State** | `state.isRunning`<br>`state.shouldRunWhenActive`<br>`state.animationFrameId` | `#control-pause-resume`<br>(`Pause Rendering` / `Resume Rendering`) | Cancels `requestAnimationFrame` scheduling (`animationFrameId = null`), eliminating continuous per-frame rendering passes. Explicit one-shot redraws (`drawScene()`) still execute on resize, color change, or reset without restarting the loop. |
+
+> [!NOTE]
+> **Scope of Loop Pausing:** Pausing the rendering loop halts continuous per-frame `requestAnimationFrame` rendering work (eliminating recurring GPU drawing and matrix calculations to conserve battery and CPU/GPU cycles). However, **it does not stop all CPU or GPU activity**: background browser tasks, garbage collection passes, event listeners (e.g. window resize, button clicks), and on-demand synchronous redraw passes (`drawScene()`) triggered by DOM mutations or canvas resizing continue to execute on the CPU/GPU as required.
 
 ---
 
@@ -108,15 +112,29 @@ All five interactive controls in `modules/module1-webgl/index.html` (lines 90–
 - **No Shader Recompilation or Buffer Reallocation:** Updating vertex colors via `gl.bufferSubData()` transfers the 576 bytes into the existing GPU buffer allocation in-place (`state.shaderCompileCount` and `state.geometryAllocCount` remain unchanged at `1`, while `state.vboSubDataUpdateCount` increments).
 - **Contrast with a Uniform-Based Color Design:** If the shader instead used `uniform vec3 u_objectColor;`, changing the color would only require calling `gl.uniform3f(location, r, g, b)` without touching the VBO, but all 6 faces would be forced to share the same uniform color (or require 6 separate draw calls).
 
+> [!IMPORTANT]
+> **JavaScript Telemetry vs. GPU Driver Memory Leaks:** Diagnostic counters (`shaderCompileCount`, `geometryAllocCount`, `vboSubDataUpdateCount`) verify that JavaScript application code makes zero redundant WebGL API calls during color mutations or resets. However, **these client-side counters do not directly prove the complete absence of GPU memory leaks at the graphics driver or browser engine level**. Verifying that the GPU driver and compositor reclaim internal VRAM without fragmentation requires operating-system or GPU-vendor profiling tools (e.g. RenderDoc, NVIDIA Nsight, or the Chromium Task Manager GPU memory inspector).
+
 ---
 
-## 8. Rendering Lifecycle and Context Restoration
+## 8. Rendering Lifecycle, Context Restoration & Failure Containment
 
-Upon `webglcontextlost` and `webglcontextrestored` (`handleContextLost` / `handleContextRestored` in `main.js`, lines 1547–1608):
+### 8.1. Context Loss & Restoration
+Upon `webglcontextlost` and `webglcontextrestored` (`handleContextLost` / `handleContextRestored` in `main.js`, lines 1555–1616):
 
 1. `handleContextLost(event)` calls `event.preventDefault()`, invalidates GPU handles (`program = null`, `geometry = null`), and stops the loop via `stopRenderLoop(false)` so `state.shouldRunWhenActive` preserves whether the user had the loop running or manually paused prior to the context loss.
 2. `handleContextRestored()` resets the animation timing baseline (`resetAnimationTimeBaseline()`), synchronizes canvas dimensions and WebGL state, and calls `initSceneResources(state.gl)`, which creates a fresh VAO, VBO, and EBO populated directly from `state.cpuCubeVertexData` — automatically preserving any custom face colors applied before the context loss.
-3. Finally, if `state.shouldRunWhenActive === true`, `startRenderLoop()` resumes continuous rendering; if the user had manually paused rendering before context loss, the loop remains paused (`isRunning: false`) and executes a single `drawScene()` pass.
+3. If GPU resource creation succeeds and `state.shouldRunWhenActive === true`, `startRenderLoop()` resumes continuous rendering; if the user had manually paused rendering before context loss, the loop remains paused (`isRunning: false`) and executes a single `drawScene()` pass.
+
+### 8.2. Resource Rebuild Failure Containment
+In `resetToDefaults()` and `setMeshMode()`:
+- If shader recompilation or geometry allocation fails (e.g. invalid shader syntax or memory failure), `initSceneResources()` catches the error, releases partially created resources, and returns `false`.
+- Both functions explicitly evaluate this boolean result. If `false`:
+  1. `stopRenderLoop(false)` immediately cancels any active or pending `requestAnimationFrame` ticks.
+  2. `clearFramebuffer()` clears the canvas to a clean state.
+  3. `updateShaderErrorOverlay(message)` displays the diagnostic error overlay with the compiler log.
+  4. `updateTelemetryDisplay()` and `syncControlsUI()` preserve a clean, recoverable failure state.
+  5. Continuous rendering loops are **never started or resumed without valid GPU resources**, preventing headless error cycles or duplicate loop scheduling.
 
 ---
 
@@ -125,24 +143,25 @@ Upon `webglcontextlost` and `webglcontextrestored` (`handleContextLost` / `handl
 | File | Key Functions & Line Ranges | Role in Task 3.4 |
 | :--- | :--- | :--- |
 | `modules/module1-webgl/index.html` | Lines `66–72` (`#telemetry-rotation`), Lines `98–194` (`#control-panel`) | Adds the live Euler rotation telemetry item and the accessible 5-control strip (Auto-Rotate checkbox, Speed range slider + `<output>`, Face Target `<select>` + Color `<input type="color">` + `6-Face Palette` button, `Pause/Resume Rendering` button, and `Reset Defaults` button). |
-| `modules/module1-webgl/style.css` | Lines `183–404` (`.control-panel` and child rules), Lines `592–608` (mobile rules) | Styles the scientific control strip using `DESIGN.md` navy/blue/cyan tokens, `36px` minimum control height, `2px solid var(--focus-ring)` keyboard focus outlines, and tabular monospace numeric readouts. |
+| `modules/module1-webgl/style.css` | Lines `183–404` (`.control-panel` and child rules), Lines `577–638` (compact & mobile media queries) | Styles the scientific control strip using `DESIGN.md` navy/blue/cyan tokens, `36px` minimum control height, `2px solid var(--focus-ring)` keyboard focus outlines, and responsive wrapping for mobile viewports (`390px`, `320px`). |
 | `modules/module1-webgl/js/geometry.js` | `updateGeometryBuffer` (lines `562–570`), `hexToNormalizedRgb` (lines `582–591`), `normalizedRgbToHex` (lines `602–608`), `applyCubeFaceColor` (lines `621–654`) | Converts `#RRGGBB` hex colors to normalized `[0..1]` RGB floats, mutates either all 24 cube vertices or a specific 4-vertex face in `Float32Array(144)`, and updates the GPU VBO in-place via `gl.bufferSubData()`. |
-| `modules/module1-webgl/js/main.js` | `wrapAngleDegrees` (lines `407–413`), `resetAnimationTimeBaseline` (lines `488–492`), `syncControlsUI` (lines `581–614`), `renderFrame` (lines `1040–1092`), `setAutoRotate` / `setRotationSpeed` / `applyObjectColor` / `restoreDefaultCubePalette` / `resetToDefaults` (lines `1183–1418`) | Implements frame-rate-independent delta-time rotation, 100 ms delta clamping, two-way synchronization between DOM controls and `window.Module1WebGL`, and zero-reallocation scene reset. |
+| `modules/module1-webgl/js/main.js` | `wrapAngleDegrees` (lines `407–413`), `resetAnimationTimeBaseline` (lines `488–492`), `syncControlsUI` (lines `581–616`), `renderFrame` (lines `1048–1100`), `startRenderLoop` (lines `1127–1152`), `resetToDefaults` (lines `1339–1430`), `setMeshMode` (lines `2075–2096`) | Implements frame-rate-independent delta-time rotation, 100 ms delta clamping, two-way synchronization between DOM controls and `window.Module1WebGL`, zero-reallocation scene reset, and verified failure containment paths. |
 
 ---
 
 ## 10. Testing Procedures and Actual Results
 
-All automated verification suites in `verify_task34.mjs` were executed in headless Google Chrome via Chrome DevTools Protocol:
+All automated verification suites in `verify_task34.mjs` and `verify_review_t34.mjs` were executed in Google Chrome via Chrome DevTools Protocol:
 
 | Test Suite | Procedure | Observed Result | Status |
 | :--- | :--- | :--- | :--- |
 | **1. Continuous Delta-Time Animation & Clamping** | Verified live `requestAnimationFrame` rotation over `320 ms`, deterministic `10 × 0.05 s` steps at `60°/s`, simulated `5.0 s` suspension spike (`MAX_DELTA_TIME_SECONDS = 0.1 s`), and `setFixedStepMode(true, 1.25)` | Live loop rendered `46` frames and advanced `ryDeg`; `10 × 0.05 s` at `60°/s` rotated by `+30.0°`; `5.0 s` spike clamped to `0.1 s` (`+6.0°`, total `36.0°`); `fixedStepMode` applied `+1.25°`; `shaderCompileCount = 1`, `geometryAllocCount = 1` | **Passed** |
 | **2. Animation State vs. Rendering State Separation** | Unchecked `#control-auto-rotate` while running (`250 ms`); then re-enabled Auto-Rotate and clicked `#control-pause-resume` to pause (`250 ms`) and resume | With Auto-Rotate `Off`, `frameCount` advanced by `37` frames while `rotationDeg` stayed frozen; with Rendering Paused, `frameCount` advanced by `0`, `isRunning = false`, and button switched to `"Resume Rendering"` (`aria-pressed="true"`); resuming kept a single `animationFrameId` | **Passed** |
 | **3. DOM Controls & VBO `gl.bufferSubData` Color Updates** | Changed `#control-rotation-speed` to `120`; set Front face (`"0"`) to `#e6334d`; set `"all"` faces to `#f0c832`; clicked `#control-color-palette`; tested DevTools-to-UI sync (`setRotationSpeed(95)`, `setAutoRotate(false)`) and `#control-reset` | Front face sampled `[230, 51, 77, 255]` while Top face stayed `[56, 199, 217, 255]`; `"all"` updated both faces to `[240, 200, 50, 255]`; `vboSubDataUpdateCount` incremented by `2`; `#control-reset` restored `45°/s`, `autoRotate = true`, `rotationDeg = [18, -28, 0]` with `shaderCompileCount = 1` and `geometryAllocCount = 1` | **Passed** |
-| **4. Context Loss & Restoration State Preservation** | Paused loop, set speed `110°/s`, `autoRotate = false`, custom color `#33cc77`, triggered `simulateContextLoss()` + `simulateContextRestore()` | After restore: `hasEBO = true`, `isRunning = false` (paused state preserved), `rotationSpeedDegPerSec = 110`, `autoRotate = false`, Front face sampled `[51, 204, 119, 255]` | **Passed** |
-| **5. Portal Iframe, Sidebar Resize While Paused & Reload** | Loaded `index.html#/module1`, paused loop, collapsed/expanded `#sidebar-collapse-btn`, clicked `#module-reload-btn` | Buffer width updated `1061 -> 1269 -> 1061 px` while `isRunning` stayed `false`; Front face redrew `[92, 148, 255, 255]`; reload reinitialized animated cube with `0` console/page errors | **Passed** |
-| **6. Physical Mobile / Non-Chromium Browser Hardware** | Real iOS Safari / Android physical device testing | Desktop and mobile viewports were verified in Chromium; physical mobile hardware and native Safari/Firefox binaries were not executed in this automated run | **Not Tested** |
+| **4. GPU Resource Rebuild Failure & Recovery Path** | Tested `resetToDefaults()` and `setMeshMode()` during simulated shader compilation error; verified loop termination, error overlay presence, and recovery | Loop stopped immediately (`isRunning = false`, `animationFrameId = null`); error overlay displayed syntax error log; calling `resetToDefaults()` with valid shaders restored full rendering with zero duplicate loops | **Passed** |
+| **5. Context Loss & Restoration State Preservation** | Paused loop, set speed `110°/s`, `autoRotate = false`, custom color `#33cc77`, triggered `simulateContextLoss()` + `simulateContextRestore()` | After restore: `hasEBO = true`, `isRunning = false` (paused state preserved), `rotationSpeedDegPerSec = 110`, `autoRotate = false`, Front face sampled `[51, 204, 119, 255]` | **Passed** |
+| **6. Mobile Viewport Layout Verification (`390×844` & `320×568`)** | Measured `#control-panel` element bounding rects, flex-wrap behavior, and horizontal overflow on representative mobile viewport dimensions | Controls wrapped cleanly into readable rows; zero horizontal overflow detected (`scrollWidth <= clientWidth`); canvas stage retained usable rendering area; desktop & sidebar behaviors preserved | **Passed** |
+| **7. Physical Mobile Hardware / Non-Chromium Browser Engines** | Real iOS Safari / Android physical device testing | Mobile viewports were verified in Chromium CDP; physical mobile hardware and native Safari/Firefox binaries were not executed in this automated run | **Not Tested** |
 
 ---
 
@@ -150,6 +169,7 @@ All automated verification suites in `verify_task34.mjs` were executed in headle
 
 1. **Single-Axis Primary Auto-Rotation:** By default, continuous animation rotates the cube around its vertical Y axis (`ryDeg`) while holding pitch (`rxDeg = 18°`) and roll (`rzDeg = 0°`) fixed so all side faces pass clearly across the camera frustum. Arbitrary 3-axis rotations remain accessible via `window.Module1WebGL.setModelRotation(rx, ry, rz)`.
 2. **Unlit Vertex Color Shading:** Surface colors are interpolated directly from per-vertex `a_color` attributes in the VBO without dynamic directional/point lighting calculations, keeping the GPU pipeline focused on MVP transformations, VBO updates, and lifecycle management.
+3. **Clamping Lag vs. Wall-Clock Divergence:** Under heavy CPU/GPU stalls ($\Delta t > 0.1\text{ s}$), clamping deliberately slows down rotational progression relative to real-world time to avoid disorienting teleportation.
 
 ---
 
@@ -207,9 +227,10 @@ All 6 reversible experiments below can be executed in browser DevTools via `wind
 
 ## 13. Key Learning Outcomes
 
-- **Time-Based Animation Decouples Simulation from Refresh Rate:** Multiplying angular velocity ($\text{deg/s}$) by `deltaTimeSeconds` ensures identical rotation speed across `60 Hz`, `120 Hz`, and `144 Hz` displays.
-- **Clamping + Baseline Reset Prevents Frame-Spike Teleportation:** Resetting `lastFrameTimeMs = null` on pause/resume/visibility transitions and clamping `deltaTimeSeconds <= 0.1 s` eliminates rotation jumps after tab switches or context loss.
+- **Time-Based Animation Decouples Simulation from Refresh Rate:** Multiplying angular velocity ($\text{deg/s}$) by `deltaTimeSeconds` ensures approximately identical rotation speed across `60 Hz`, `120 Hz`, and `144 Hz` displays under normal operating conditions.
+- **Clamping + Baseline Reset Prevents Frame-Spike Teleportation:** Resetting `lastFrameTimeMs = null` on pause/resume/visibility transitions and clamping `deltaTimeSeconds <= 0.1 s` prevents jarring rotational jumps, deliberately sacrificing strict wall-clock accuracy during large stalls to maintain visual stability.
 - **Uniform Updates vs. Buffer Sub-Data Updates:** Rigid-body motion (rotation, translation, scaling) updates a 16-float `uniform mat4` (`gl.uniformMatrix4fv`) while leaving VBO vertices untouched; modifying per-vertex colors updates the existing VBO in-place via `gl.bufferSubData()` without recompiling shaders or reallocating buffers.
+- **Robust Failure Containment:** Validating resource creation results on every rebuild path (`initSceneResources()`) ensures that shader compilation errors halt headless render loops, display compiler diagnostics, and preserve a clean recoverable state.
 
 ---
 

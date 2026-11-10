@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * Module 01: WebGL Graphics — Task 3.2 & Task 3.3: GLSL ES 3.00 Shader Pipeline
+ * Module 01: WebGL Graphics — Tasks 3.2 – 3.5: GLSL ES 3.00 Shader Pipeline
  * ============================================================================
  *
  * Educational Research Purpose:
@@ -22,33 +22,30 @@
  *      operations (such as the Depth Test and blending) before surviving
  *      fragments are written into the framebuffer's Color Buffer.
  *
- * 2. Attributes (`in`) vs. Uniforms (`uniform mat4`):
+ * 2. Attributes (`in`) vs. Uniforms (`uniform`):
  *    - **Vertex Attributes (`in vec3 a_position`, `in vec3 a_color`):** Change
  *      from vertex to vertex and are fetched from a Vertex Buffer Object (VBO).
- *    - **Uniforms (`uniform mat4 u_modelMatrix`, `u_viewMatrix`, `u_projectionMatrix`):**
- *      Remain constant ("uniform") across all vertices and fragments processed
- *      within a single draw call. Their GPU slot handles (`WebGLUniformLocation`)
- *      are queried once after `gl.linkProgram()` via `gl.getUniformLocation()`,
- *      and their 16-float column-major values are uploaded via
- *      `gl.uniformMatrix4fv(location, false, float32Matrix)`.
+ *    - **Uniforms (`uniform mat4 u_modelMatrix`, `u_viewMatrix`, `u_projectionMatrix`,
+ *      `uniform vec3 u_partColor`):** Remain constant ("uniform") across all
+ *      vertices and fragments processed within a single draw call. Their GPU
+ *      slot handles (`WebGLUniformLocation`) are queried once after
+ *      `gl.linkProgram()` via `gl.getUniformLocation()`.
  *
- * 3. Matrix Multiplication & Storage Agreement:
+ * 3. Task 3.5 Geometry Reuse via Per-Draw-Call Uniforms (`u_modelMatrix` & `u_partColor`):
+ *    When rendering a composite 3D object (such as the 13-part Desktop PC Case)
+ *    by reusing a single unit-cube VAO/VBO/EBO across multiple `gl.drawElements()`
+ *    calls, each draw call represents a different box component with its own
+ *    world transform and material color. By uploading a per-part `u_modelMatrix`
+ *    and `u_partColor` (`u_usePartColor = 1.0`) before each draw call, one 576-byte
+ *    VBO can render any number of differently sized, positioned, and colored
+ *    3D boxes without allocating additional GPU buffers!
+ *
+ * 4. Matrix Multiplication & Storage Agreement:
  *    In GLSL ES 3.00, `mat4` is stored in **Column-Major Order** and `vec4`
  *    behaves as a column vector when placed on the right of a matrix (`M * v`).
  *    Therefore, `u_projectionMatrix * u_viewMatrix * u_modelMatrix * vec4(a_position, 1.0)`
  *    applies `u_modelMatrix` first (Object -> World Space), `u_viewMatrix` second
  *    (World -> View/Camera Space), and `u_projectionMatrix` third (View -> Clip Space).
- *
- * 4. GLSL ES 3.00 vs. Legacy GLSL ES 1.00 (WebGL 1.0):
- *    - `#version 300 es` must appear on the very first line of the shader string,
- *      with no preceding comments or non-whitespace tokens (only horizontal
- *      whitespace before `#version` on line 1 is permitted by the GLSL ES 3.00
- *      specification); otherwise compilation fails or falls back to GLSL ES 1.00.
- *    - Vertex inputs use `in` (replacing legacy `attribute`).
- *    - Data passed from Vertex Shader to Fragment Shader uses `out` in the
- *      Vertex Shader and matching `in` in the Fragment Shader (replacing `varying`).
- *    - Fragment outputs use an explicit `out vec4 outColor;` declaration
- *      (replacing the removed built-in `gl_FragColor`).
  * ============================================================================
  */
 
@@ -58,13 +55,6 @@
   /**
    * Explicit attribute slot locations shared between JavaScript VAO setup and
    * the GLSL ES 3.00 Vertex Shader `layout(location = ...)` qualifiers.
-   *
-   * WHY USE EXPLICIT ATTRIBUTE LOCATIONS?
-   * In GLSL ES 3.00, `layout(location = N)` binds each vertex input variable to
-   * a fixed hardware attribute slot at compile time. This guarantees that
-   * position is always slot 0 and color is always slot 1 across both the
-   * 3D Cube VAO and the Task 3.2 Triangle VAO without relying on arbitrary
-   * compiler assignment order.
    */
   const ATTRIBUTE_LOCATIONS = Object.freeze({
     POSITION: 0,
@@ -78,10 +68,14 @@
     MODEL_MATRIX: "u_modelMatrix",
     VIEW_MATRIX: "u_viewMatrix",
     PROJECTION_MATRIX: "u_projectionMatrix",
+    PART_COLOR: "u_partColor",
+    USE_PART_COLOR: "u_usePartColor",
+    FACE_SHADING_STRENGTH: "u_faceShadingStrength",
   });
 
   /**
-   * Default GLSL ES 3.00 Vertex Shader Source (Task 3.3: 3D MVP Transformation Pipeline).
+   * Default GLSL ES 3.00 Vertex Shader Source (Tasks 3.3 – 3.5: 3D MVP Pipeline
+   * with support for both per-vertex VBO colors and per-component uniform colors).
    *
    * Execution Role:
    * Runs for each vertex submitted by `gl.drawElements()` or `gl.drawArrays()`.
@@ -91,16 +85,18 @@
    *   read from the bound Vertex Buffer Object (VBO).
    * - `a_color` (`vec3` at location 1): Normalized RGB vertex/face color in [0.0, 1.0].
    *
-   * Uniforms (`uniform mat4`):
-   * - `u_modelMatrix`: Transforms Object Space -> World Space (Scale, Rotate, Translate).
-   * - `u_viewMatrix`: Transforms World Space -> Camera/View Space (`lookAt`).
-   * - `u_projectionMatrix`: Transforms View Space -> Homogeneous Clip Space (`perspective`).
-   *
-   * Note on Compatibility with Task 3.2 Clip-Space Triangle Mode:
-   * When `u_modelMatrix`, `u_viewMatrix`, and `u_projectionMatrix` are set to the
-   * 4x4 Identity Matrix (`I_4`), `I * I * I * vec4(a_position, 1.0)` reduces
-   * mathematically to `vec4(a_position, 1.0)` — the exact clip-space pass-through
-   * equation from Task 3.2!
+   * Uniforms:
+   * - `u_modelMatrix` (`mat4`): Transforms Object Space -> World Space (`M_worldPart = M_root * M_localPart`).
+   * - `u_viewMatrix` (`mat4`): Transforms World Space -> Camera/View Space (`lookAt`).
+   * - `u_projectionMatrix` (`mat4`): Transforms View Space -> Homogeneous Clip Space (`perspective`).
+   * - `u_partColor` (`vec3`): Base RGB material color for the current composite component.
+   * - `u_usePartColor` (`float`): `1.0` when rendering composite PC Case components
+   *   with `u_partColor`; `0.0` when rendering the single 6-face colored Cube or
+   *   Clip-Space Triangle using the VBO `a_color` attribute.
+   * - `u_faceShadingStrength` (`float` in `[0.0, 1.0]`): Controls directional
+   *   per-face luminance differentiation in composite mode (`1.0` default so
+   *   adjacent orthogonal faces of a single-color box remain visually distinct;
+   *   `0.0` disables face shading to demonstrate how flat colors hide 3D edges).
    */
   const VERTEX_SHADER_SOURCE = `#version 300 es
 
@@ -110,12 +106,45 @@ layout(location = 1) in vec3 a_color;
 uniform mat4 u_modelMatrix;
 uniform mat4 u_viewMatrix;
 uniform mat4 u_projectionMatrix;
+uniform vec3 u_partColor;
+uniform float u_usePartColor;
+uniform float u_faceShadingStrength;
 
 out vec3 v_color;
 
 void main() {
   gl_Position = u_projectionMatrix * u_viewMatrix * u_modelMatrix * vec4(a_position, 1.0);
-  v_color = a_color;
+
+  if (u_usePartColor > 0.5) {
+    // In our 24-vertex unit cube VBO, every 4 consecutive vertices belong to
+    // one of the 6 orthogonal faces (0: +Z Front, 1: -Z Back, 2: +Y Top,
+    // 3: -Y Bottom, 4: +X Right, 5: -X Left). Using GLSL ES 3.00's built-in
+    // gl_VertexID lets us apply a deterministic directional shade multiplier
+    // per face without needing extra normal attributes in the VBO.
+    // NOTE: These shade factors (1.00, 0.72, 1.14, 0.58, 0.88, 0.76) are
+    // manually selected empirical visual multipliers chosen for aesthetic
+    // 3D form contrast, NOT physically based lighting (PBR) or normal-based
+    // illumination calculations (e.g. Lambertian N·L or Blinn-Phong).
+    int faceId = gl_VertexID / 4;
+    float faceShade = 1.0;
+    if (faceId == 0) {
+      faceShade = 1.00; // Front (+Z): primary studio key light
+    } else if (faceId == 1) {
+      faceShade = 0.72; // Back (-Z): rear shadow
+    } else if (faceId == 2) {
+      faceShade = 1.14; // Top (+Y): overhead zenith highlight
+    } else if (faceId == 3) {
+      faceShade = 0.58; // Bottom (-Y): underside occlusion
+    } else if (faceId == 4) {
+      faceShade = 0.88; // Right (+X): secondary fill light
+    } else {
+      faceShade = 0.76; // Left (-X): side shadow
+    }
+    float effectiveShade = mix(1.0, faceShade, clamp(u_faceShadingStrength, 0.0, 1.0));
+    v_color = clamp(u_partColor * effectiveShade, 0.0, 1.0);
+  } else {
+    v_color = a_color;
+  }
 }
 `;
 
@@ -138,27 +167,6 @@ void main() {
 
   /**
    * GLSL ES 3.00 Fragment Shader Source.
-   *
-   * Execution Role:
-   * Runs once for every candidate pixel fragment covered by a rasterized triangle.
-   *
-   * Precision Qualifier (`precision mediump float;`):
-   * GLSL ES requires an explicit default floating-point precision in the
-   * Fragment Shader (unlike Vertex Shaders, which default to `highp` for floats).
-   * `mediump` provides at least 10-bit significand precision, which is standard
-   * and sufficient for interpolated normalized color values in [0.0, 1.0].
-   *
-   * Inputs (`in`):
-   * - `v_color` (`vec3`): The barycentrically interpolated RGB color at the
-   *   current fragment's center, matching `out vec3 v_color` from the Vertex Shader.
-   *   (For our 3D Cube, where all 4 vertices of a given face share the same
-   *   color, barycentric interpolation produces a crisp, uniform face color;
-   *   for the Task 3.2 triangle, it produces a smooth RGB gradient).
-   *
-   * Outputs (`out`):
-   * - `outColor` (`vec4`): Explicit fragment color output sent to the per-fragment
-   *   output merger (where fragments that pass `gl.DEPTH_TEST` write their RGBA
-   *   value into attachment 0 of the default framebuffer's Color Buffer).
    */
   const FRAGMENT_SHADER_SOURCE = `#version 300 es
 precision mediump float;
@@ -174,10 +182,6 @@ void main() {
   /**
    * Creates and compiles an individual GLSL shader object on the GPU.
    *
-   * Purpose:
-   * Translates human-readable GLSL ES 3.00 source code into GPU-specific
-   * intermediate instructions for either the Vertex or Fragment stage.
-   *
    * @param {WebGL2RenderingContext} gl Active WebGL 2.0 rendering context
    * @param {number} type `gl.VERTEX_SHADER` or `gl.FRAGMENT_SHADER`
    * @param {string} source GLSL ES 3.00 source string (must start with `#version 300 es`)
@@ -188,7 +192,6 @@ void main() {
     const stageName =
       type === gl.VERTEX_SHADER ? "VERTEX_SHADER" : "FRAGMENT_SHADER";
 
-    // 1. Allocate an empty shader object handle on the GPU driver.
     const shader = gl.createShader(type);
     if (!shader) {
       throw new Error(
@@ -196,13 +199,9 @@ void main() {
       );
     }
 
-    // 2. Upload the GLSL source string into the shader object and invoke the
-    //    driver's built-in GLSL ES 3.00 compiler.
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
 
-    // 3. Query compilation status. WebGL never throws JavaScript exceptions on
-    //    GLSL syntax errors; we must inspect `gl.COMPILE_STATUS` manually.
     const compiledSuccessfully = gl.getShaderParameter(
       shader,
       gl.COMPILE_STATUS
@@ -211,7 +210,6 @@ void main() {
     if (!compiledSuccessfully) {
       const infoLog =
         gl.getShaderInfoLog(shader) || "Unknown GLSL compilation error.";
-      // Clean up the failed GPU shader handle immediately to prevent a resource leak.
       gl.deleteShader(shader);
       throw new Error(`[GLSL ${stageName} Compilation Failed]\n${infoLog.trim()}`);
     }
@@ -221,14 +219,7 @@ void main() {
 
   /**
    * Compiles Vertex and Fragment shaders, links them into a complete executable
-   * `WebGLProgram`, and queries both attribute and matrix uniform locations.
-   *
-   * WHY LINKING IS REQUIRED AFTER COMPILATION:
-   * Compiling checks each shader stage in isolation, whereas linking verifies
-   * that the interface between stages matches (e.g., `out vec3 v_color` in the
-   * Vertex Shader matches `in vec3 v_color` in the Fragment Shader in name,
-   * type, and interpolation qualifier) and assigns uniform storage locations
-   * (`WebGLUniformLocation`) inside the linked executable.
+   * `WebGLProgram`, and queries both attribute and uniform locations.
    *
    * @param {WebGL2RenderingContext} gl Active WebGL 2.0 rendering context
    * @param {string} [vertexSource=VERTEX_SHADER_SOURCE] GLSL ES 3.00 vertex shader source
@@ -239,10 +230,12 @@ void main() {
    *   uniformLocations: {
    *     modelMatrix: WebGLUniformLocation | null,
    *     viewMatrix: WebGLUniformLocation | null,
-   *     projectionMatrix: WebGLUniformLocation | null
+   *     projectionMatrix: WebGLUniformLocation | null,
+   *     partColor: WebGLUniformLocation | null,
+   *     usePartColor: WebGLUniformLocation | null,
+   *     faceShadingStrength: WebGLUniformLocation | null
    *   }
-   * }} Linked program, attribute locations, and matrix uniform locations
-   * @throws {Error} If either shader fails to compile or the program fails to link
+   * }}
    */
   function createShaderProgram(
     gl,
@@ -254,11 +247,9 @@ void main() {
     let program = null;
 
     try {
-      // 1. Compile both programmable stages independently.
       vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource);
       fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
 
-      // 2. Allocate a WebGLProgram container and attach the compiled stages.
       program = gl.createProgram();
       if (!program) {
         throw new Error("Failed to allocate WebGLProgram object.");
@@ -266,11 +257,8 @@ void main() {
 
       gl.attachShader(program, vertexShader);
       gl.attachShader(program, fragmentShader);
-
-      // 3. Link the attached stages into a single GPU pipeline executable.
       gl.linkProgram(program);
 
-      // 4. Verify link status and retrieve diagnostic logs on failure.
       const linkedSuccessfully = gl.getProgramParameter(
         program,
         gl.LINK_STATUS
@@ -281,8 +269,6 @@ void main() {
         throw new Error(`[WebGLProgram Linking Failed]\n${infoLog.trim()}`);
       }
 
-      // 5. Detach and delete the intermediate WebGLShader objects now that the
-      //    executable binary is stored inside `program`.
       gl.detachShader(program, vertexShader);
       gl.detachShader(program, fragmentShader);
       gl.deleteShader(vertexShader);
@@ -290,14 +276,9 @@ void main() {
       vertexShader = null;
       fragmentShader = null;
 
-      // 6. Query attribute locations (matching layout(location = 0) and 1).
       const positionLoc = gl.getAttribLocation(program, "a_position");
       const colorLoc = gl.getAttribLocation(program, "a_color");
 
-      // 7. Query uniform locations for the 4x4 Model, View, and Projection matrices.
-      //    Note: `gl.getUniformLocation()` returns `null` if a custom shader
-      //    (such as a Task 3.2 clip-space test shader) does not declare or use
-      //    that uniform.
       const modelMatrixLoc = gl.getUniformLocation(
         program,
         UNIFORM_NAMES.MODEL_MATRIX
@@ -309,6 +290,18 @@ void main() {
       const projectionMatrixLoc = gl.getUniformLocation(
         program,
         UNIFORM_NAMES.PROJECTION_MATRIX
+      );
+      const partColorLoc = gl.getUniformLocation(
+        program,
+        UNIFORM_NAMES.PART_COLOR
+      );
+      const usePartColorLoc = gl.getUniformLocation(
+        program,
+        UNIFORM_NAMES.USE_PART_COLOR
+      );
+      const faceShadingStrengthLoc = gl.getUniformLocation(
+        program,
+        UNIFORM_NAMES.FACE_SHADING_STRENGTH
       );
 
       return {
@@ -322,10 +315,12 @@ void main() {
           modelMatrix: modelMatrixLoc,
           viewMatrix: viewMatrixLoc,
           projectionMatrix: projectionMatrixLoc,
+          partColor: partColorLoc,
+          usePartColor: usePartColorLoc,
+          faceShadingStrength: faceShadingStrengthLoc,
         },
       };
     } catch (error) {
-      // Safely release any partially created GPU objects before re-throwing.
       if (vertexShader) {
         gl.deleteShader(vertexShader);
       }
@@ -352,7 +347,6 @@ void main() {
     gl.deleteProgram(program);
   }
 
-  // Expose shader pipeline utilities to Module 1 scripts
   window.Module1Shaders = Object.freeze({
     ATTRIBUTE_LOCATIONS,
     UNIFORM_NAMES,

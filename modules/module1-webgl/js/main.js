@@ -57,6 +57,7 @@
   const Math3D = window.Module1Math;
   const Shaders = window.Module1Shaders;
   const Geometry = window.Module1Geometry;
+  const PCCase = window.Module1PCCase;
 
   // --------------------------------------------------------------------------
   // 1. Constants & Initial WebGL / 3D Scene / Animation Configuration
@@ -144,6 +145,7 @@
    * predictable while we also reset the time baseline (`lastFrameTimeMs = null`)
    * on explicit pause/resume, tab visibility changes, and context restoration.
    */
+  const DEFAULT_MESH_MODE = "pccase";
   const DEFAULT_AUTO_ROTATE = true;
   const DEFAULT_ROTATION_SPEED_DEG_PER_SEC = 45.0;
   const MIN_ROTATION_SPEED_DEG_PER_SEC = 0.0;
@@ -181,7 +183,10 @@
   const telemetryClearColor = document.getElementById("telemetry-clear-color");
   const telemetryFrames = document.getElementById("telemetry-frames");
 
-  // Task 3.4 Interactive Control Panel DOM elements
+  // Task 3.4 & 3.5 Interactive Control Panel DOM elements
+  const controlMeshMode = /** @type {HTMLSelectElement | null} */ (
+    document.getElementById("control-mesh-mode")
+  );
   const controlAutoRotate = /** @type {HTMLInputElement | null} */ (
     document.getElementById("control-auto-rotate")
   );
@@ -247,10 +252,18 @@
      */
     uniformLocations: null,
     /**
-     * @type {"cube" | "triangle"} Active mesh mode (`"cube"` is Task 3.3/3.4 default;
-     * `"triangle"` is preserved for Task 3.2 educational continuity).
+     * @type {"pccase" | "cube" | "triangle"} Active scene/mesh mode:
+     * - `"pccase"`: Task 3.5 procedural Desktop PC Case (13 parts reusing 1 Cube VAO)
+     * - `"cube"`: Task 3.3 / 3.4 single 6-face colored 3D Cube reference
+     * - `"triangle"`: Task 3.2 Clip-Space Triangle reference
      */
-    meshMode: "cube",
+    meshMode: "pccase",
+    /** @type {ReturnType<typeof PCCase.createPCCaseScene> | null} Task 3.5 composite PC Case state */
+    pcCaseScene: PCCase ? PCCase.createPCCaseScene(Math3D) : null,
+    /** @type {number} Task 3.5 per-face directional luminance contrast (`[0.0, 1.0]`) */
+    faceShadingStrength: 1.0,
+    /** @type {number} Number of WebGL draw calls executed in the most recent `drawScene()` pass */
+    lastFrameDrawCallCount: 13,
     /**
      * @type {{
      *   meshType: "cube" | "triangle",
@@ -431,6 +444,13 @@
       return;
     }
     Math3D.composeModelMatrix(state.modelParams, state.modelMatrix);
+    if (PCCase && state.pcCaseScene) {
+      PCCase.updatePCCaseMatrices(
+        state.pcCaseScene,
+        state.modelMatrix,
+        Math3D
+      );
+    }
   }
 
   /**
@@ -530,7 +550,12 @@
       const stride = state.geometry
         ? state.geometry.strideBytes
         : state.attributeLayout.strideBytes;
-      if (state.geometry && state.geometry.indexed) {
+      if (state.meshMode === "pccase" && state.pcCaseScene) {
+        const visibleParts = state.pcCaseScene.parts.filter(
+          (p) => p.visible
+        ).length;
+        telemetryGeometry.textContent = `${visibleParts} parts · ${vCount}v · ${iCount}i (${state.lastFrameDrawCallCount} draws)`;
+      } else if (state.geometry && state.geometry.indexed) {
         telemetryGeometry.textContent = `${vCount} verts · ${iCount} idx · ${stride}B`;
       } else {
         telemetryGeometry.textContent = `${vCount} verts · ${stride}B stride`;
@@ -553,12 +578,19 @@
       telemetryFrames.textContent = String(state.frameCount);
     }
     if (stageCaptionTitle && stageCaptionText) {
-      if (state.geometry && state.geometry.indexed) {
+      const rotModeLabel = state.autoRotate
+        ? `Auto-Rotate ${Math.round(state.rotationSpeedDegPerSec)}°/s`
+        : "Auto-Rotate Off";
+      if (state.meshMode === "pccase" && state.pcCaseScene) {
+        const visibleParts = state.pcCaseScene.parts.filter(
+          (p) => p.visible
+        ).length;
+        stageCaptionTitle.textContent =
+          "Task 3.5 Composite PC Case · 1 Shared Cube VAO (24v/36i) × 13 Hierarchical Parts";
+        stageCaptionText.textContent = `${visibleParts} × gl.drawElements(gl.${state.primitiveModeName}, 36, gl.UNSIGNED_SHORT, 0) · M_world = M_root × M_local · ${rotModeLabel}`;
+      } else if (state.geometry && state.geometry.indexed) {
         stageCaptionTitle.textContent =
           "GLSL ES 3.00 3D Pipeline · VAO + VBO (24v) + EBO (Uint16Array 36i)";
-        const rotModeLabel = state.autoRotate
-          ? `Auto-Rotate ${Math.round(state.rotationSpeedDegPerSec)}°/s`
-          : "Auto-Rotate Off";
         stageCaptionText.textContent = `gl.drawElements(gl.${state.primitiveModeName}, ${state.geometry.indexCount}, gl.UNSIGNED_SHORT, 0) · ${rotModeLabel}`;
       } else {
         const vCount = state.geometry ? state.geometry.vertexCount : 3;
@@ -570,15 +602,19 @@
   }
 
   /**
-   * Synchronizes all Task 3.4 DOM controls (`#control-auto-rotate`,
-   * `#control-rotation-speed`, `#control-color-target`, `#control-object-color`,
-   * `#control-pause-resume`) with the single source of truth in `state`.
+   * Synchronizes all Task 3.4 / Task 3.5 DOM controls (`#control-mesh-mode`,
+   * `#control-auto-rotate`, `#control-rotation-speed`, `#control-color-target`,
+   * `#control-object-color`, `#control-pause-resume`) with the single source of
+   * truth in `state`.
    *
    * Calling this function from both DOM event handlers AND programmatic
    * `window.Module1WebGL` helpers guarantees that DevTools experiments never
    * leave the UI controls out of sync with the actual rendering state.
    */
   function syncControlsUI() {
+    if (controlMeshMode) {
+      controlMeshMode.value = String(state.meshMode);
+    }
     if (controlAutoRotate) {
       controlAutoRotate.checked = Boolean(state.autoRotate);
     }
@@ -972,10 +1008,26 @@
    * --------------------------------------------------------------
    * When the user pauses continuous rendering (`Pause Rendering`), we stop
    * scheduling `requestAnimationFrame` callbacks. However, if the user resizes
-   * the browser window, collapses the Portal sidebar, picks a new cube color,
-   * or clicks `Reset Defaults` while paused, the canvas still needs a single
-   * immediate repaint to reflect that change without restarting the continuous
-   * animation loop or advancing `frameCount`.
+   * the browser window, collapses the Portal sidebar, picks a new color,
+   * switches scene modes, or clicks `Reset Defaults` while paused, the canvas
+   * still needs a single immediate repaint to reflect that change without
+   * restarting the continuous animation loop or advancing `frameCount`.
+   *
+   * HOW COMPOSITE MULTI-PART RENDERING WORKS (`meshMode === "pccase"`):
+   * -------------------------------------------------------------------
+   * Instead of allocating 13 separate VAOs/VBOs/EBOs on the GPU, we:
+   * 1. Bind the active shader program (`gl.useProgram(state.program)`) ONCE.
+   * 2. Upload the shared `u_viewMatrix`, `u_projectionMatrix`,
+   *    `u_usePartColor = 1.0`, and `u_faceShadingStrength` uniforms ONCE.
+   * 3. Bind the single unit-cube VAO (`gl.bindVertexArray(state.geometry.vao)`) ONCE.
+   * 4. Iterate through the visible parts in `state.pcCaseScene.parts`:
+   *    - Upload the part's hierarchical `part.worldMatrix` (`M_root * M_localPart`)
+   *      to `u_modelMatrix`.
+   *    - Upload the part's normalized RGB `part.color` to `u_partColor`.
+   *    - Issue `gl.drawElements(mode, 36, gl.UNSIGNED_SHORT, 0)` (submitting 36
+   *      index references = 12 triangles per part, totaling 156 triangles across
+   *      the 13 components while leveraging GPU post-transform vertex caching).
+   * 5. Unbind the VAO (`gl.bindVertexArray(null)`).
    */
   function drawScene() {
     const gl = state.gl;
@@ -986,10 +1038,80 @@
     clearFramebuffer();
 
     if (!state.program || !state.geometry || !state.geometry.vao) {
+      state.lastFrameDrawCallCount = 0;
       return;
     }
 
     gl.useProgram(state.program);
+
+    const mode =
+      typeof state.primitiveMode === "number" ? state.primitiveMode : gl.TRIANGLES;
+
+    if (
+      state.meshMode === "pccase" &&
+      state.pcCaseScene &&
+      state.geometry.indexed
+    ) {
+      if (state.uniformLocations) {
+        if (state.uniformLocations.viewMatrix !== null) {
+          gl.uniformMatrix4fv(
+            state.uniformLocations.viewMatrix,
+            false,
+            state.viewMatrix
+          );
+        }
+        if (state.uniformLocations.projectionMatrix !== null) {
+          gl.uniformMatrix4fv(
+            state.uniformLocations.projectionMatrix,
+            false,
+            state.projectionMatrix
+          );
+        }
+        if (state.uniformLocations.usePartColor !== null) {
+          gl.uniform1f(state.uniformLocations.usePartColor, 1.0);
+        }
+        if (state.uniformLocations.faceShadingStrength !== null) {
+          gl.uniform1f(
+            state.uniformLocations.faceShadingStrength,
+            state.faceShadingStrength
+          );
+        }
+      }
+
+      gl.bindVertexArray(state.geometry.vao);
+
+      let drawCalls = 0;
+      const parts = state.pcCaseScene.parts;
+      for (let i = 0; i < parts.length; i += 1) {
+        const part = parts[i];
+        if (!part.visible) {
+          continue;
+        }
+        if (state.uniformLocations) {
+          if (state.uniformLocations.modelMatrix !== null) {
+            gl.uniformMatrix4fv(
+              state.uniformLocations.modelMatrix,
+              false,
+              part.worldMatrix
+            );
+          }
+          if (state.uniformLocations.partColor !== null) {
+            gl.uniform3fv(state.uniformLocations.partColor, part.color);
+          }
+        }
+        gl.drawElements(
+          mode,
+          state.geometry.indexCount,
+          state.geometry.indexType,
+          0
+        );
+        drawCalls += 1;
+      }
+
+      state.lastFrameDrawCallCount = drawCalls;
+      gl.bindVertexArray(null);
+      return;
+    }
 
     if (state.uniformLocations) {
       const useIdentity = state.meshMode === "triangle";
@@ -1006,12 +1128,15 @@
       if (state.uniformLocations.projectionMatrix !== null) {
         gl.uniformMatrix4fv(state.uniformLocations.projectionMatrix, false, pMat);
       }
+      if (state.uniformLocations.usePartColor !== null) {
+        gl.uniform1f(state.uniformLocations.usePartColor, 0.0);
+      }
+      if (state.uniformLocations.faceShadingStrength !== null) {
+        gl.uniform1f(state.uniformLocations.faceShadingStrength, 0.0);
+      }
     }
 
     gl.bindVertexArray(state.geometry.vao);
-
-    const mode =
-      typeof state.primitiveMode === "number" ? state.primitiveMode : gl.TRIANGLES;
 
     if (state.geometry.indexed) {
       gl.drawElements(
@@ -1024,6 +1149,7 @@
       gl.drawArrays(mode, 0, state.geometry.vertexCount);
     }
 
+    state.lastFrameDrawCallCount = 1;
     gl.bindVertexArray(null);
   }
 
@@ -1032,7 +1158,9 @@
    * 1. Computes `deltaTimeSeconds` from the browser's `DOMHighResTimeStamp`.
    * 2. Clamps unusually large intervals (`> 0.1 s`) caused by tab backgrounding.
    * 3. If `state.autoRotate` is enabled, advances `state.modelParams.rotationDeg[1]`
-   *    by `rotationSpeedDegPerSec * deltaTimeSeconds` and updates `state.modelMatrix`.
+   *    by `rotationSpeedDegPerSec * deltaTimeSeconds` and updates `state.modelMatrix`
+   *    (which in turn recomputes every PC Case component's `part.worldMatrix` via
+   *    `M_worldPart = M_root * M_localPart`).
    * 4. Calls `drawScene()` to render the frame and updates telemetry periodically.
    *
    * @param {DOMHighResTimeStamp} timestampMs High-resolution timestamp from rAF
@@ -1062,7 +1190,10 @@
     state.lastRawDeltaSeconds = rawDeltaSeconds;
     state.lastDeltaSeconds = clampedDeltaSeconds;
 
-    if (state.autoRotate && state.meshMode === "cube") {
+    if (
+      state.autoRotate &&
+      (state.meshMode === "pccase" || state.meshMode === "cube")
+    ) {
       const rotationDeltaDegrees = state.fixedStepMode
         ? state.fixedStepDegPerFrame
         : state.rotationSpeedDegPerSec * clampedDeltaSeconds;
@@ -1125,6 +1256,14 @@
     state.shouldRunWhenActive = true;
 
     if (state.isContextLost) {
+      syncControlsUI();
+      return;
+    }
+
+    // Guard against starting continuous rendering passes when GPU resources
+    // (Shader Program or Geometry buffers) are unallocated or compilation failed.
+    if (!state.program || !state.geometry) {
+      state.isRunning = false;
       syncControlsUI();
       return;
     }
@@ -1214,13 +1353,17 @@
 
   /**
    * Applies a color (given as a CSS `#RRGGBB` hex string or normalized `[r, g, b]`
-   * array) to the specified `faceTarget` (`"all"` for all 6 faces / 24 vertices,
-   * or `0..5` for a single face / 4 vertices) and updates the GPU VBO in-place
-   * via `gl.bufferSubData()`.
+   * array) to the specified `faceTarget`:
+   * - In `"pccase"` mode (or for PC Case component group/part targets such as
+   *   `"all"`, `"chassis"`, `"front"`, `"side"`, `"accent"`, `"details"`, or an
+   *   individual part id), updates the matching `part.color` uniforms in
+   *   `state.pcCaseScene`.
+   * - For `"all"` or cube face indices `"0".."5"`, also updates the 24-vertex
+   *   cube VBO in-place via `gl.bufferSubData()` so `"cube"` mode stays in sync.
    *
    * @param {string | [number, number, number]} colorInput Hex string `"#rrggbb"` or `[r, g, b]` in `[0..1]`
-   * @param {"all" | number | string} [faceTarget] `"all"` or face index `0..5` (defaults to `state.colorTarget`)
-   * @returns {{ target: string, hex: string, rgb: [number, number, number], vboSubDataUpdateCount: number } | null}
+   * @param {"all" | number | string} [faceTarget] `"all"`, PC Case group/part id, or face index `0..5`
+   * @returns {{ target: string, hex: string, rgb: [number, number, number], updatedPartCount: number, vboSubDataUpdateCount: number } | null}
    */
   function applyObjectColor(colorInput, faceTarget) {
     if (!Geometry) {
@@ -1245,12 +1388,29 @@
       hex = Geometry.normalizedRgbToHex(rgb[0], rgb[1], rgb[2]);
     }
 
-    const updated = Geometry.applyCubeFaceColor(
-      state.cpuCubeVertexData,
-      target === "all" ? "all" : Number(target),
-      rgb
-    );
-    if (!updated) {
+    let updatedPartCount = 0;
+    if (PCCase && state.pcCaseScene) {
+      updatedPartCount = PCCase.applyPCCaseColor(state.pcCaseScene, target, rgb);
+    }
+
+    const numericFace = Number(target);
+    const isCubeFaceTarget =
+      target === "all" ||
+      (Number.isInteger(numericFace) &&
+        numericFace >= 0 &&
+        numericFace < 6 &&
+        String(numericFace) === target.trim());
+
+    let updatedCubeFaces = false;
+    if (isCubeFaceTarget) {
+      updatedCubeFaces = Geometry.applyCubeFaceColor(
+        state.cpuCubeVertexData,
+        target === "all" ? "all" : numericFace,
+        rgb
+      );
+    }
+
+    if (updatedPartCount === 0 && !updatedCubeFaces) {
       return null;
     }
 
@@ -1264,9 +1424,11 @@
       state.gl &&
       !state.isContextLost
     ) {
-      state.geometry.vertexData.set(state.cpuCubeVertexData);
-      if (Geometry.updateGeometryBuffer(state.gl, state.geometry)) {
-        state.vboSubDataUpdateCount += 1;
+      if (updatedCubeFaces) {
+        state.geometry.vertexData.set(state.cpuCubeVertexData);
+        if (Geometry.updateGeometryBuffer(state.gl, state.geometry)) {
+          state.vboSubDataUpdateCount += 1;
+        }
       }
       if (!state.isRunning) {
         drawScene();
@@ -1278,18 +1440,25 @@
       target: state.colorTarget,
       hex: state.selectedColorHex,
       rgb,
+      updatedPartCount,
       vboSubDataUpdateCount: state.vboSubDataUpdateCount,
     };
   }
 
   /**
-   * Restores the canonical 6-face scientific color palette in `state.cpuCubeVertexData`
-   * and uploads it to the existing GPU VBO via `gl.bufferSubData()` without
-   * reallocating buffers or recompiling shaders.
+   * Restores both:
+   * 1. The default multi-material engineering palette for all 13 PC Case parts
+   *    (`PCCase.restoreDefaultPCCaseColors(state.pcCaseScene)`), AND
+   * 2. The canonical 6-face scientific color palette in `state.cpuCubeVertexData`
+   *    (uploaded via `gl.bufferSubData()`), without reallocating buffers or
+   *    recompiling shaders.
    */
   function restoreDefaultCubePalette() {
     if (!Geometry) {
       return null;
+    }
+    if (PCCase && state.pcCaseScene) {
+      PCCase.restoreDefaultPCCaseColors(state.pcCaseScene);
     }
     state.cpuCubeVertexData = Geometry.createDefaultCubeVertexData();
     state.isDefaultPalette = true;
@@ -1318,9 +1487,64 @@
   }
 
   /**
-   * Restores all Task 3.3 & Task 3.4 parameters to their documented defaults:
-   * - Mesh mode (`"cube"`, 24 vertices, 36 indices)
-   * - Model transformation (`translation: [0,0,0]`, `rotationDeg: [18,-28,0]`, `scale: [1,1,1]`)
+   * Switches the active scene mode between:
+   * - `"pccase"`: Task 3.5 Procedural Composite Desktop PC Case (13 parts sharing
+   *   the single 24-vertex, 36-index unit-cube VAO/VBO/EBO).
+   * - `"cube"`: Task 3.3 Single Reference 3D Cube (using the same 24-vertex,
+   *   36-index VAO/VBO/EBO with zero GPU buffer reallocation when switching
+   *   from `"pccase"`!).
+   * - `"triangle"`: Task 3.2 2D Clip-Space Triangle (3 vertices).
+   *
+   * @param {"pccase" | "cube" | "triangle"} mode Target scene mode
+   * @returns {object} Diagnostic snapshot
+   */
+  function switchSceneMode(mode) {
+    const normalized = String(mode || DEFAULT_MESH_MODE).toLowerCase();
+    if (
+      normalized !== "pccase" &&
+      normalized !== "cube" &&
+      normalized !== "triangle"
+    ) {
+      throw new Error(
+        `Unsupported meshMode "${mode}". Choose "pccase" (Task 3.5), "cube" (Task 3.3), or "triangle" (Task 3.2).`
+      );
+    }
+
+    const targetMeshType = normalized === "triangle" ? "triangle" : "cube";
+    const canReuseExistingCubeGeometry =
+      Boolean(state.program) &&
+      !state.lastShaderError &&
+      Boolean(state.geometry) &&
+      state.geometry.meshType === targetMeshType &&
+      targetMeshType === "cube";
+
+    state.meshMode = /** @type {"pccase" | "cube" | "triangle"} */ (normalized);
+
+    if (state.gl && !state.isContextLost) {
+      if (!canReuseExistingCubeGeometry) {
+        const resourcesReady = initSceneResources(state.gl);
+        if (!resourcesReady) {
+          stopRenderLoop(false);
+          clearFramebuffer();
+          syncControlsUI();
+          updateTelemetryDisplay();
+          return window.Module1WebGL.getDiagnostics();
+        }
+      }
+      drawScene();
+    }
+
+    syncControlsUI();
+    updateTelemetryDisplay();
+    return window.Module1WebGL.getDiagnostics();
+  }
+
+  /**
+   * Restores all Task 3.3, Task 3.4 & Task 3.5 parameters to their documented defaults:
+   * - Scene mode (`"pccase"`, 13 composite parts sharing 1 cube VAO of 24v / 36i)
+   * - All 13 PC Case component local transforms, visibility flags, sub-assembly
+   *   transforms, and default multi-material colors (`PCCase.resetPCCaseScene`)
+   * - Root Model transformation (`translation: [0,0,0]`, `rotationDeg: [18,-28,0]`, `scale: [1,1,1]`)
    * - Camera and Perspective Projection parameters (`eye: [1.9,1.5,2.6]`, `fovYDeg: 45°`)
    * - Animation state (`autoRotate: true`, `rotationSpeedDegPerSec: 45°/s`, `fixedStepMode: false`)
    * - Default 6-face vertex colors (updated in-place via `gl.bufferSubData()` when
@@ -1333,8 +1557,7 @@
       !state.program ||
       Boolean(state.lastShaderError) ||
       !state.geometry ||
-      state.geometry.meshType !== "cube" ||
-      state.meshMode !== "cube";
+      state.geometry.meshType !== "cube";
 
     const needsLayoutRestore =
       Geometry &&
@@ -1344,7 +1567,8 @@
         state.attributeLayout.colorOffsetBytes !==
           Geometry.DEFAULT_COLOR_OFFSET_BYTES);
 
-    state.meshMode = "cube";
+    state.meshMode = DEFAULT_MESH_MODE;
+    state.faceShadingStrength = 1.0;
     if (Geometry) {
       state.cpuCubeVertexData = Geometry.createDefaultCubeVertexData();
       state.cpuCubeIndexData = Geometry.createDefaultCubeIndexData();
@@ -1386,12 +1610,22 @@
 
     resetAnimationTimeBaseline();
     updateAllMatrices();
+    if (PCCase && state.pcCaseScene && Math3D) {
+      PCCase.resetPCCaseScene(state.pcCaseScene, state.modelMatrix, Math3D);
+    }
 
     if (state.gl && !state.isContextLost) {
       configureWebGLState(state.gl);
 
       if (needsResourceRebuild) {
-        initSceneResources(state.gl);
+        const resourcesReady = initSceneResources(state.gl);
+        if (!resourcesReady) {
+          stopRenderLoop(false);
+          clearFramebuffer();
+          syncControlsUI();
+          updateTelemetryDisplay();
+          return false;
+        }
       } else if (Geometry && state.geometry) {
         // Fast in-place reset path: update VBO colors via gl.bufferSubData
         // without recompiling shaders or reallocating VAO/VBO/EBO!
@@ -1415,11 +1649,21 @@
 
     syncControlsUI();
     updateTelemetryDisplay();
+    return true;
   }
 
   /**
-   * Registers DOM event listeners for the Task 3.4 interactive control strip.
+   * Registers DOM event listeners for the Task 3.4 / Task 3.5 interactive control strip.
    */
+  function handleMeshModeChange() {
+    if (!controlMeshMode) {
+      return;
+    }
+    switchSceneMode(
+      /** @type {"pccase" | "cube" | "triangle"} */ (controlMeshMode.value)
+    );
+  }
+
   function handleAutoRotateChange() {
     if (!controlAutoRotate) {
       return;
@@ -1439,15 +1683,32 @@
       return;
     }
     state.colorTarget = controlColorTarget.value;
-    // Sync color picker preview with the selected face's current vertex color
+    // Sync color picker preview with the selected group's or face's current color
     if (state.colorTarget !== "all" && Geometry) {
       const faceIdx = Number(state.colorTarget);
-      if (faceIdx >= 0 && faceIdx < 6) {
+      if (
+        Number.isInteger(faceIdx) &&
+        faceIdx >= 0 &&
+        faceIdx < 6 &&
+        String(faceIdx) === state.colorTarget.trim()
+      ) {
         const base = faceIdx * 4 * Geometry.FLOATS_PER_VERTEX;
         const r = state.cpuCubeVertexData[base + 3];
         const g = state.cpuCubeVertexData[base + 4];
         const b = state.cpuCubeVertexData[base + 5];
         state.selectedColorHex = Geometry.normalizedRgbToHex(r, g, b);
+      } else if (PCCase && state.pcCaseScene) {
+        const repRgb = PCCase.getRepresentativeColor(
+          state.pcCaseScene,
+          state.colorTarget
+        );
+        if (repRgb) {
+          state.selectedColorHex = Geometry.normalizedRgbToHex(
+            repRgb[0],
+            repRgb[1],
+            repRgb[2]
+          );
+        }
       }
     }
     syncControlsUI();
@@ -1485,6 +1746,9 @@
   }
 
   function setupControlListeners() {
+    if (controlMeshMode) {
+      controlMeshMode.addEventListener("change", handleMeshModeChange);
+    }
     if (controlAutoRotate) {
       controlAutoRotate.addEventListener("change", handleAutoRotateChange);
     }
@@ -1510,6 +1774,9 @@
   }
 
   function teardownControlListeners() {
+    if (controlMeshMode) {
+      controlMeshMode.removeEventListener("change", handleMeshModeChange);
+    }
     if (controlAutoRotate) {
       controlAutoRotate.removeEventListener("change", handleAutoRotateChange);
     }
@@ -1681,19 +1948,35 @@
 
   /**
    * Exposes a safe, read/experimentation helper on `window.Module1WebGL` so the
-   * student can run hands-on DevTools console experiments for Tasks 3.1 – 3.4.
+   * student can run hands-on DevTools console experiments for Tasks 3.1 – 3.5.
    */
   function exposeEducationalDebugAPI() {
     window.Module1WebGL = {
       /**
        * Returns a snapshot of current runtime metrics, GPU resources, animation
-       * timing state, UI control settings, and 3D matrices.
+       * timing state, UI control settings, 3D matrices, and composite PC Case
+       * part hierarchy.
        */
       getDiagnostics() {
         const activeVertexArray =
           state.meshMode === "triangle"
             ? state.cpuTriangleVertexData
             : state.cpuCubeVertexData;
+        const pcParts = state.pcCaseScene
+          ? state.pcCaseScene.parts.map((p) => ({
+              id: p.id,
+              label: p.label,
+              group: p.group,
+              subAssembly: p.subAssembly,
+              visible: p.visible,
+              localTranslation: [...p.localTranslation],
+              localRotationDeg: [...p.localRotationDeg],
+              localScale: [...p.localScale],
+              color: Array.from(p.color),
+            }))
+          : [];
+        const visiblePartCount = pcParts.filter((p) => p.visible).length;
+
         return {
           hasWebGL2: Boolean(state.gl),
           hasShaderProgram: Boolean(state.program),
@@ -1716,6 +1999,11 @@
             ? state.geometry.colorOffsetBytes
             : state.attributeLayout.colorOffsetBytes,
           primitiveMode: state.primitiveModeName,
+          partCount: pcParts.length,
+          visiblePartCount,
+          drawCallsPerFrame: state.lastFrameDrawCallCount,
+          faceShadingStrength: state.faceShadingStrength,
+          pcCaseParts: pcParts,
           autoRotate: state.autoRotate,
           rotationSpeedDegPerSec: state.rotationSpeedDegPerSec,
           fixedStepMode: state.fixedStepMode,
@@ -1766,6 +2054,248 @@
       },
 
       /**
+       * [Task 3.5 Helper] Returns a detailed list of all 13 PC Case components,
+       * including their local transform parameters, color, visibility, and
+       * current `localMatrix` and `worldMatrix`.
+       */
+      getPCCaseParts() {
+        if (!state.pcCaseScene) {
+          return [];
+        }
+        return state.pcCaseScene.parts.map((p) => ({
+          id: p.id,
+          label: p.label,
+          group: p.group,
+          subAssembly: p.subAssembly,
+          role: p.role,
+          visible: p.visible,
+          localTranslation: [...p.localTranslation],
+          localRotationDeg: [...p.localRotationDeg],
+          localScale: [...p.localScale],
+          color: Array.from(p.color),
+          localMatrix: Array.from(p.localMatrix),
+          worldMatrix: Array.from(p.worldMatrix),
+        }));
+      },
+
+      /**
+       * [Task 3.5 Helper] Updates a specific PC Case component's local
+       * transformation (`translation`, `rotationDeg`, `scale`) relative to the
+       * PC Case root (and its sub-assembly), recomputes `M_worldPart`, and
+       * repaints if paused.
+       *
+       * @param {string} partId Component identifier (e.g. `"side_glass_panel"`, `"power_button"`)
+       * @param {{ translation?: [number, number, number], rotationDeg?: [number, number, number], scale?: [number, number, number] }} params
+       */
+      setPartTransform(partId, params) {
+        if (!state.pcCaseScene || !params || typeof params !== "object") {
+          return null;
+        }
+        const part = state.pcCaseScene.partMap[String(partId)];
+        if (!part) {
+          return null;
+        }
+        if (Array.isArray(params.translation) && params.translation.length === 3) {
+          part.localTranslation = [
+            Number(params.translation[0]) || 0.0,
+            Number(params.translation[1]) || 0.0,
+            Number(params.translation[2]) || 0.0,
+          ];
+        }
+        if (Array.isArray(params.rotationDeg) && params.rotationDeg.length === 3) {
+          part.localRotationDeg = [
+            Number(params.rotationDeg[0]) || 0.0,
+            Number(params.rotationDeg[1]) || 0.0,
+            Number(params.rotationDeg[2]) || 0.0,
+          ];
+        }
+        if (Array.isArray(params.scale) && params.scale.length === 3) {
+          part.localScale = [
+            Number(params.scale[0]) || 0.01,
+            Number(params.scale[1]) || 0.01,
+            Number(params.scale[2]) || 0.01,
+          ];
+        }
+        updateModelMatrix();
+        if (!state.isRunning && !state.isContextLost) {
+          drawScene();
+        }
+        return {
+          id: part.id,
+          localTranslation: [...part.localTranslation],
+          localRotationDeg: [...part.localRotationDeg],
+          localScale: [...part.localScale],
+          localMatrix: Array.from(part.localMatrix),
+          worldMatrix: Array.from(part.worldMatrix),
+        };
+      },
+
+      /**
+       * [Task 3.5 Helper] Updates the color of a PC Case component group
+       * (`"all"`, `"chassis"`, `"front"`, `"side"`, `"accent"`, `"details"`) or
+       * an individual component `id` (e.g., `"power_button"`, `"front_bezel"`).
+       *
+       * @param {string} target Group name, part id, or `"all"`
+       * @param {string | [number, number, number]} colorInput Hex `"#rrggbb"` or `[r, g, b]` in `[0..1]`
+       */
+      setPartColor(target, colorInput) {
+        return applyObjectColor(colorInput, target);
+      },
+
+      /**
+       * [Task 3.5 Helper] Toggles visibility of a single PC Case component or
+       * `"all"` components to inspect how individual parts contribute to the
+       * composite 13-draw-call scene.
+       *
+       * @param {string} partId Component id (e.g. `"side_glass_panel"`) or `"all"`
+       * @param {boolean} visible True to draw; false to skip in `drawScene()`
+       */
+      setPartVisibility(partId, visible) {
+        if (!state.pcCaseScene) {
+          return null;
+        }
+        const flag = Boolean(visible);
+        const key = String(partId || "");
+        let count = 0;
+        for (let i = 0; i < state.pcCaseScene.parts.length; i += 1) {
+          const p = state.pcCaseScene.parts[i];
+          if (key === "all" || p.id === key || p.group === key) {
+            p.visible = flag;
+            count += 1;
+          }
+        }
+        if (count === 0) {
+          return null;
+        }
+        if (!state.isRunning && !state.isContextLost) {
+          drawScene();
+        }
+        updateTelemetryDisplay();
+        return {
+          target: key,
+          visible: flag,
+          updatedCount: count,
+          visiblePartCount: state.pcCaseScene.parts.filter((p) => p.visible).length,
+        };
+      },
+
+      /**
+       * [Task 3.5 Hierarchical Sub-Assembly Helper] Applies an intermediate
+       * parent transformation (`translation`, `rotationDeg`, `scale`) to a
+       * logical sub-assembly (`"front_panel"`, `"side_panel"`, `"chassis_body"`,
+       * or `"base_feet"`), demonstrating a 3-level hierarchy:
+       * `M_worldPart = M_root * M_subAssembly * M_localPart`.
+       *
+       * @param {"front_panel" | "side_panel" | "chassis_body" | "base_feet"} subAssemblyId
+       * @param {{ translation?: [number, number, number], rotationDeg?: [number, number, number], scale?: [number, number, number] }} params
+       */
+      setSubAssemblyTransform(subAssemblyId, params) {
+        if (!state.pcCaseScene || !params || typeof params !== "object") {
+          return null;
+        }
+        const sub = state.pcCaseScene.subAssemblies[String(subAssemblyId)];
+        if (!sub) {
+          return null;
+        }
+        if (Array.isArray(params.translation) && params.translation.length === 3) {
+          sub.translation = [
+            Number(params.translation[0]) || 0.0,
+            Number(params.translation[1]) || 0.0,
+            Number(params.translation[2]) || 0.0,
+          ];
+        }
+        if (Array.isArray(params.rotationDeg) && params.rotationDeg.length === 3) {
+          sub.rotationDeg = [
+            Number(params.rotationDeg[0]) || 0.0,
+            Number(params.rotationDeg[1]) || 0.0,
+            Number(params.rotationDeg[2]) || 0.0,
+          ];
+        }
+        if (Array.isArray(params.scale) && params.scale.length === 3) {
+          sub.scale = [
+            Number(params.scale[0]) || 1.0,
+            Number(params.scale[1]) || 1.0,
+            Number(params.scale[2]) || 1.0,
+          ];
+        }
+        updateModelMatrix();
+        if (!state.isRunning && !state.isContextLost) {
+          drawScene();
+        }
+        return {
+          id: sub.id,
+          label: sub.label,
+          translation: [...sub.translation],
+          rotationDeg: [...sub.rotationDeg],
+          scale: [...sub.scale],
+          matrix: Array.from(sub.matrix),
+        };
+      },
+
+      /**
+       * [Task 3.5 Helper] Sets `u_faceShadingStrength` in `[0.0, 1.0]` to
+       * compare flat unshaded part colors (`0.0`, where adjacent faces of the
+       * same cuboid blend together) against deterministic per-face shade factors
+       * (`1.0`, default, using `gl_VertexID / 4`).
+       *
+       * @param {number} strength Value in `[0.0, 1.0]`
+       */
+      setFaceShadingStrength(strength) {
+        const clamped = Math.min(1.0, Math.max(0.0, Number(strength)));
+        state.faceShadingStrength = Number.isFinite(clamped) ? clamped : 1.0;
+        if (!state.isRunning && !state.isContextLost) {
+          drawScene();
+        }
+        return state.faceShadingStrength;
+      },
+
+      /**
+       * [Task 3.5 Mathematical Inspection Helper] Computes and returns the
+       * step-by-step hierarchical transformation of a part's local center `[0,0,0]`
+       * and a front-top-right corner `[0.5, 0.5, 0.5]` through `M_localPart`
+       * and `M_root` into World Space and NDC.
+       *
+       * @param {string} [partId="power_button"]
+       */
+      computePartMatrixDemo(partId = "power_button") {
+        if (!state.pcCaseScene || !Math3D) {
+          return null;
+        }
+        const part = state.pcCaseScene.partMap[String(partId)];
+        if (!part) {
+          return null;
+        }
+        const centerInCaseSpace = Math3D.transformVec4(
+          part.localMatrix,
+          [0, 0, 0, 1]
+        );
+        const cornerInCaseSpace = Math3D.transformVec4(
+          part.localMatrix,
+          [0.5, 0.5, 0.5, 1]
+        );
+        const centerProjection = Math3D.projectPointToNdc(
+          [0, 0, 0],
+          part.worldMatrix,
+          state.viewMatrix,
+          state.projectionMatrix
+        );
+        return {
+          partId: part.id,
+          label: part.label,
+          localTranslation: [...part.localTranslation],
+          localRotationDeg: [...part.localRotationDeg],
+          localScale: [...part.localScale],
+          localMatrix: Array.from(part.localMatrix),
+          rootModelMatrix: Array.from(state.modelMatrix),
+          worldMatrix: Array.from(part.worldMatrix),
+          centerInCaseSpace: centerInCaseSpace.slice(0, 3),
+          cornerInCaseSpace: cornerInCaseSpace.slice(0, 3),
+          centerWorldSpace: centerProjection.worldSpace.slice(0, 3),
+          centerNdc: centerProjection.ndc,
+        };
+      },
+
+      /**
        * [Task 3.4 Helper] Enables or disables continuous time-based cube rotation
        * (`state.autoRotate`) and synchronizes the `#control-auto-rotate` checkbox.
        *
@@ -1807,21 +2337,22 @@
       },
 
       /**
-       * [Task 3.4 Helper] Updates the cube's vertex colors in the VBO via
-       * `gl.bufferSubData()` for either all 6 faces (`target = "all"`) or a
-       * specific face (`target = 0..5`) without recompiling shaders or reallocating
-       * GPU buffers.
+       * [Task 3.4 / 3.5 Helper] Updates the active object's colors:
+       * - For PC Case targets (`"all"`, `"chassis"`, `"front"`, `"side"`, `"accent"`,
+       *   `"details"`, or a part id), updates `part.color` uniforms.
+       * - For `"all"` or cube face indices `0..5`, also updates the cube VBO
+       *   in-place via `gl.bufferSubData()`.
        *
        * @param {string | [number, number, number]} colorInput Hex `"#rrggbb"` or `[r, g, b]` in `[0..1]`
-       * @param {"all" | number | string} [faceTarget="all"] `"all"` or face index `0..5`
+       * @param {"all" | number | string} [faceTarget="all"] `"all"`, PC Case group/part id, or face index `0..5`
        */
       setCubeColor(colorInput, faceTarget = "all") {
         return applyObjectColor(colorInput, faceTarget);
       },
 
       /**
-       * [Task 3.4 Helper] Restores the default 6-face scientific color palette
-       * in the VBO via `gl.bufferSubData()`.
+       * [Task 3.4 / 3.5 Helper] Restores both the default 13-part PC Case
+       * multi-material palette and the default 6-face scientific cube palette.
        */
       restoreDefaultPalette() {
         return restoreDefaultCubePalette();
@@ -1843,7 +2374,10 @@
         state.lastDeltaSeconds = clamped;
 
         let appliedDeltaDeg = 0.0;
-        if (state.autoRotate && state.meshMode === "cube") {
+        if (
+          state.autoRotate &&
+          (state.meshMode === "pccase" || state.meshMode === "cube")
+        ) {
           appliedDeltaDeg = state.fixedStepMode
             ? state.fixedStepDegPerFrame
             : state.rotationSpeedDegPerSec * clamped;
@@ -1864,9 +2398,10 @@
       },
 
       /**
-       * [Task 3.3 Helper] Updates the cube's Euler rotation angles (in degrees)
-       * in the Model Matrix (`M = T * Rz * Ry * Rx * S`) and redraws immediately
-       * if the loop is paused.
+       * [Task 3.3 / 3.5 Helper] Updates the root object's Euler rotation angles
+       * (in degrees) in the root Model Matrix (`M_root = T * Rz * Ry * Rx * S`),
+       * recomputes all 13 PC Case `part.worldMatrix` matrices, and redraws
+       * immediately if the loop is paused.
        *
        * @param {number} rxDeg Pitch rotation around X axis in degrees
        * @param {number} ryDeg Yaw rotation around Y axis in degrees
@@ -1887,8 +2422,8 @@
       },
 
       /**
-       * [Task 3.3 Helper] Updates the cube's World-Space translation `(tx, ty, tz)`
-       * in the Model Matrix (`M = T * Rz * Ry * Rx * S`).
+       * [Task 3.3 / 3.5 Helper] Updates the root object's World-Space translation
+       * `(tx, ty, tz)` in `M_root`.
        *
        * @param {number} tx Translation along World X
        * @param {number} ty Translation along World Y
@@ -1908,8 +2443,8 @@
       },
 
       /**
-       * [Task 3.3 Helper] Updates the cube's local scale factors `(sx, sy, sz)`
-       * in the Model Matrix (`M = T * Rz * Ry * Rx * S`).
+       * [Task 3.3 / 3.5 Helper] Updates the root object's scale factors `(sx, sy, sz)`
+       * in `M_root`.
        *
        * @param {number} sx Scale along local X (or uniform scale if sy/sz omitted)
        * @param {number} [sy] Scale along local Y
@@ -1928,7 +2463,7 @@
       },
 
       /**
-       * [Task 3.3 Helper] Updates multiple Model Matrix parameters at once.
+       * [Task 3.3 / 3.5 Helper] Updates multiple root Model Matrix parameters at once.
        */
       setModelTransform(params) {
         if (!params || typeof params !== "object") {
@@ -2050,25 +2585,15 @@
       },
 
       /**
-       * [Task 3.2 / 3.3 Helper] Switches the active scene geometry between the
-       * Task 3.3 Indexed 3D Cube (`"cube"`) and the Task 3.2 Clip-Space Triangle
-       * (`"triangle"`).
+       * [Task 3.2 / 3.3 / 3.5 Helper] Switches the active scene mode between:
+       * - `"pccase"`: Task 3.5 Composite Desktop PC Case (13 parts sharing 1 cube VAO)
+       * - `"cube"`: Task 3.3 Reference Indexed 3D Cube (1 cube VAO)
+       * - `"triangle"`: Task 3.2 2D Clip-Space Triangle (3 vertices)
        *
-       * @param {"cube" | "triangle"} mode
+       * @param {"pccase" | "cube" | "triangle"} mode
        */
       setMeshMode(mode) {
-        const normalized = String(mode || "cube").toLowerCase();
-        if (normalized !== "cube" && normalized !== "triangle") {
-          throw new Error(
-            `Unsupported meshMode "${mode}". Choose "cube" (Task 3.3) or "triangle" (Task 3.2).`
-          );
-        }
-        state.meshMode = /** @type {"cube" | "triangle"} */ (normalized);
-        if (state.gl && !state.isContextLost) {
-          initSceneResources(state.gl);
-          drawScene();
-        }
-        return this.getDiagnostics();
+        return switchSceneMode(mode);
       },
 
       /**
