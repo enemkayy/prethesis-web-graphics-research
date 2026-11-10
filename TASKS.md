@@ -37,11 +37,11 @@
 
 ## Phase 3 – Module 1: WebGL Graphics
 
-- [ ] Initialize the WebGL 2.0 rendering context.
-- [ ] Implement basic 3D geometry rendering.
-- [ ] Create GLSL vertex and fragment shaders.
-- [ ] Implement basic object transformations and animation.
-- [ ] Add simple user interaction controls.
+- [x] Initialize the WebGL 2.0 rendering context.
+- [x] Implement basic 3D geometry rendering.
+- [x] Create GLSL vertex and fragment shaders.
+- [x] Implement basic object transformations and animation.
+- [x] Add simple user interaction controls.
 - [ ] Integrate the module into the Web Portal.
 - [ ] Test browser compatibility and rendering behavior.
 
