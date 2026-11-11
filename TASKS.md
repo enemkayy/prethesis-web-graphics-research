@@ -43,8 +43,8 @@
 - [x] Implement basic object transformations and animation.
 - [x] Add simple user interaction controls.
 - [x] Build a procedural composite 3D study/workspace object (desktop PC case) using reusable geometry and hierarchical transformations.
-- [ ] Integrate the module into the Web Portal.
-- [ ] Test browser compatibility and rendering behavior.
+- [x] Integrate the module into the Web Portal.
+- [x] Test browser compatibility and rendering behavior.
 
 ## Phase 4 – Module 2: Graphical Applications
 
