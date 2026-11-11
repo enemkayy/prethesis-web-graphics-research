@@ -76,10 +76,8 @@ body {
 
 .instrument-bar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px 16px;
   background-color: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
@@ -118,12 +116,32 @@ body {
   text-overflow: ellipsis;
 }
 
-.telemetry-list {
+/*
+ * Dedicated Two-Row Telemetry Container
+ * Row 1: WebGL Status & Rendering Configuration (5 items: Status, CSS Size, Buffer, DPR, Geometry)
+ * Row 2: Scene & Runtime Diagnostics (4 items: Rotation, Camera, Clear RGBA, Frames)
+ * Physical row separation guarantees dynamic changes in Rotation/Frames NEVER cause row jumping.
+ */
+.telemetry-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.telemetry-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 12px;
+  gap: 6px 10px;
   list-style: none;
+  width: 100%;
+}
+
+.telemetry-status-wrapper {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .telemetry-item {
@@ -136,6 +154,49 @@ body {
   border: 1px solid var(--border-subtle);
   font-size: 0.75rem;
   line-height: 1.4;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.telemetry-item--geometry {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/*
+ * Deterministic Euler Rotation Chip
+ * Invariant 21-character monospace layout with tabular numerals and preserved whitespace
+ * ensures numeric variations (e.g. 77° vs -179°) produce zero subpixel width changes.
+ */
+.telemetry-item--rotation {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.telemetry-value--rotation {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: pre;
+  min-width: 21ch;
+  text-align: left;
+}
+
+/*
+ * Stable Frames Counter Chip
+ * Reserves 8 characters to comfortably accommodate values up to 99,999,999 without width shifts.
+ */
+.telemetry-item--frames {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.telemetry-value--frames {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  min-width: 8ch;
+  text-align: left;
 }
 
 .telemetry-label {
@@ -161,6 +222,7 @@ body {
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .status-dot {
@@ -185,37 +247,98 @@ body {
 }
 
 /* ==========================================================================
-   Task 3.4 Compact Interactive Control Strip
+   Two-Row Interactive Control Panel
+   - Row 1 (.control-panel__primary): Proportional CSS Grid across 100% available width
+   - Row 2 (.control-panel__actions): Dedicated Actions row aligned right on desktop
    ========================================================================== */
 
 .control-panel {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 14px;
+  flex-direction: column;
+  gap: 8px;
   padding: 8px 16px;
   background-color: var(--bg-surface-sunken);
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
   z-index: 2;
+  width: 100%;
 }
 
-.control-group {
+/*
+ * Row 1 – Primary Controls (CSS Grid)
+ * Allocates flexible fractional space (fr) to controls that benefit from expansion
+ * (Scene, Speed slider, and Target select) while keeping Auto-Rotate, Color,
+ * and Default Palette at their natural compact sizes.
+ */
+.control-panel__primary {
+  display: grid;
+  grid-template-columns: 
+    minmax(125px, 1.1fr)     /* 1. Scene */
+    auto                     /* 2. Auto-Rotate */
+    minmax(180px, 2.2fr)     /* 3. Speed slider */
+    minmax(160px, 1.8fr)     /* 4. Target */
+    auto                     /* 5. Color */
+    auto;                    /* 6. Default Palette */
+  align-items: center;
+  gap: 8px 14px;
+  width: 100%;
+}
+
+.control-item {
   display: inline-flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
-.control-group--actions {
-  margin-left: auto;
+.control-item--scene,
+.control-item--target {
+  width: 100%;
+}
+
+.control-item--scene .control-select,
+.control-item--target .control-select {
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.control-item--speed {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.control-item--speed .control-slider {
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 80px;
+}
+
+.control-item--color {
+  flex-shrink: 0;
+}
+
+.control-item--palette {
+  flex-shrink: 0;
+}
+
+/*
+ * Row 2 – Actions (Right-Aligned on Desktop)
+ * A dedicated second row holding Pause/Resume and Reset Defaults.
+ * Uses justify-content: flex-end on desktop to align flush with the right boundary.
+ */
+.control-panel__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
 }
 
 .control-divider {
-  width: 1px;
-  height: 22px;
-  background-color: var(--border-subtle);
-  flex-shrink: 0;
+  display: none !important;
 }
 
 .control-label {
@@ -223,6 +346,8 @@ body {
   font-weight: 500;
   color: var(--text-secondary);
   white-space: nowrap;
+  flex-shrink: 0;
+}
 }
 
 /* A. Auto-Rotate Checkbox Toggle */
@@ -287,7 +412,7 @@ body {
 
 /* B. Rotation Speed Slider */
 .control-slider {
-  width: 112px;
+  width: 88px;
   height: 6px;
   accent-color: #2f6fe4;
   cursor: pointer;
@@ -399,7 +524,7 @@ body {
 }
 
 .control-btn--compact {
-  padding: 5px 10px;
+  padding: 5px 8px;
   font-size: 0.75rem;
   border-color: var(--border-default);
   color: var(--text-secondary);
@@ -575,17 +700,31 @@ body {
 }
 
 /* ==========================================================================
-   Responsive Adjustments for Compact / Mobile Viewports
+   Responsive Adjustments for Tablet & Mobile Viewports
    ========================================================================== */
+
+@media (max-width: 1024px) {
+  .control-panel__primary {
+    grid-template-columns: 
+      minmax(130px, 1.1fr) 
+      auto 
+      minmax(170px, 1.9fr);
+    gap: 8px 12px;
+  }
+}
 
 @media (max-width: 767px) {
   .instrument-bar {
-    padding: 6px 10px;
-    gap: 4px 8px;
+    padding: 6px 12px;
+    gap: 6px;
   }
 
   .instrument-title {
     font-size: 0.75rem;
+  }
+
+  .telemetry-row {
+    gap: 4px 6px;
   }
 
   .telemetry-item {
@@ -593,21 +732,38 @@ body {
     font-size: 0.6875rem;
   }
 
+  .telemetry-value--rotation {
+    width: auto;
+    min-width: 19ch;
+  }
+
+  .telemetry-value--frames {
+    width: auto;
+    min-width: 8ch;
+  }
+
   .control-panel {
-    padding: 6px 10px;
-    gap: 6px 8px;
+    padding: 6px 12px;
+    gap: 6px;
   }
 
-  .control-divider {
-    display: none;
+  .control-panel__primary {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 10px;
   }
 
-  .control-group--actions {
-    margin-left: 0;
+  .control-item--scene,
+  .control-item--speed,
+  .control-item--target {
+    grid-column: 1 / -1;
   }
 
   .control-slider {
-    width: 80px;
+    width: 100%;
+  }
+
+  .control-panel__actions {
+    justify-content: flex-end;
   }
 
   .canvas-stage {
@@ -626,7 +782,15 @@ body {
 @media (max-width: 480px) {
   .instrument-bar {
     padding: 4px 8px;
-    gap: 4px 6px;
+    gap: 4px;
+  }
+
+  .telemetry-bar {
+    gap: 4px;
+  }
+
+  .telemetry-row {
+    gap: 3px 4px;
   }
 
   .telemetry-item {
@@ -634,22 +798,40 @@ body {
     font-size: 0.625rem;
   }
 
-  .control-panel {
-    padding: 4px 6px;
-    gap: 4px 6px;
+  .telemetry-value--rotation {
+    width: auto;
+    min-width: 17ch;
   }
 
-  .control-group {
-    gap: 4px;
+  .telemetry-value--frames {
+    width: auto;
+    min-width: 8ch;
+  }
+
+  .control-panel {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .control-panel__primary {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .control-item--scene,
+  .control-item--toggle,
+  .control-item--speed,
+  .control-item--target,
+  .control-item--color,
+  .control-item--palette {
+    grid-column: auto;
+    width: 100%;
   }
 
   .control-toggle {
-    padding: 3px 6px;
+    padding: 3px 8px;
     min-height: 32px;
-  }
-
-  .control-slider {
-    width: 64px;
+    width: 100%;
   }
 
   .control-select {
@@ -667,6 +849,15 @@ body {
     padding: 4px 8px;
     min-height: 32px;
     font-size: 0.75rem;
+  }
+
+  .control-panel__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .control-panel__actions .control-btn {
+    flex: 1 1 0;
   }
 
   .canvas-stage {

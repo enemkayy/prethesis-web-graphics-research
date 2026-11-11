@@ -1,7 +1,7 @@
 {
   "environment": {
     "label": "edge",
-    "browserProduct": "Edg/157.0.4341.42",
+    "browserProduct": "Edg/157.0.4341.46",
     "protocol": "1.3",
     "os": "Windows_NT 10.0.26200 (Windows 11 Home)",
     "node": "v24.14.1",
@@ -29,7 +29,7 @@
       "id": "SA-1",
       "category": "Integration",
       "name": "Standalone document: WebGL 2.0 initialised and rendering",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Open /modules/module1-webgl/index.html over HTTP @1280x800; wait for frames",
       "expected": "hasWebGL2, shader+VAO+VBO+EBO present, meshMode=pccase, 13 draws, frameCount grows, status 'WebGL 2.0 Active', non-clear pixels",
       "observed": {
@@ -52,16 +52,16 @@
         "status": "WebGL 2.0 Active",
         "bb": {
           "W": 1280,
-          "H": 593,
-          "litPixels": 58436,
+          "H": 594,
+          "litPixels": 81239,
           "bbox": [
-            491,
-            128,
-            743,
-            467
+            463,
+            96,
+            753,
+            500
           ],
-          "widthFrac": 0.19765625,
-          "heightFrac": 0.5733558178752108
+          "widthFrac": 0.22734375,
+          "heightFrac": 0.6818181818181818
         }
       },
       "status": "Passed"
@@ -70,16 +70,16 @@
       "id": "SA-2",
       "category": "Lifecycle",
       "name": "Single rendering loop (own rAF vs module frameCount, 2 s)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Count independent rAF callbacks and module frameCount increments over 2 s",
       "expected": "ratio ≈ 1.0 (a duplicate loop would give ≈ 2.0)",
       "observed": {
         "ownRaf": 279,
         "stateFrames": 279,
         "ratio": 1,
-        "meanIntervalMs": 7.194244604316546,
-        "p95IntervalMs": 7.300000000000182,
-        "maxIntervalMs": 14.099999999999909
+        "meanIntervalMs": 7.51906474820144,
+        "p95IntervalMs": 7.2000000000000455,
+        "maxIntervalMs": 138.80000000000018
       },
       "status": "Passed"
     },
@@ -87,7 +87,7 @@
       "id": "SA-3",
       "category": "Integration",
       "name": "Relative paths/assets: no HTTP >= 400 and no console errors while loading standalone module",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Network.responseReceived + console/exception capture during load",
       "expected": "0 failing requests (favicon.ico excluded), 0 console errors, 0 exceptions",
       "observed": {
@@ -100,7 +100,7 @@
       "id": "FN-T1",
       "category": "Functional/Triangle",
       "name": "Triangle: 3 vertices, drawArrays, non-indexed, vertex colours interpolate",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Select Triangle via #control-mesh-mode; stop rotation; sample pixels near each vertex and at centroid",
       "expected": "vertexCount=3, no EBO, draws=1, caption mentions drawArrays, each vertex region dominated by its own colour channel, centroid is a blend",
       "observed": {
@@ -112,7 +112,7 @@
           "draws": 1,
           "prim": "TRIANGLES"
         },
-        "caption": "gl.drawArrays(gl.TRIANGLES, 0, 3) · Attributes: a_position (loc 0), a_color (loc 1)",
+        "caption": "1 Draw Call (gl.drawArrays) · 3 Vertices · Barycentric Color Interpolation",
         "samples": [
           {
             "vertexColor": [
@@ -163,7 +163,7 @@
         "centre": [
           129,
           153,
-          161,
+          162,
           255
         ],
         "centreBlend": true
@@ -174,7 +174,7 @@
       "id": "FN-C1",
       "category": "Functional/Cube",
       "name": "Cube: indexed VBO/EBO/VAO, 36 indices, MVP valid, faces distinguishable, depth test occludes back faces",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Select Cube; Auto-Rotate off; rotation (0,0,0); sample centres of +X,+Y,+Z faces and the hidden -X face",
       "expected": "24v/36i, 1 draw, DEPTH_TEST enabled, 3 visible face colours pairwise distinct, hidden -X centre pixel != -X face colour",
       "observed": {
@@ -234,7 +234,7 @@
       "id": "FN-P1",
       "category": "Functional/PCCase",
       "name": "PC Case default: 13 parts, 1 shared geometry, 13 draw calls",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Reload standalone; read diagnostics",
       "expected": "partCount=13, visible=13, draws=13, compiles=1, allocs=1, VBO=576 B, EBO=72 B",
       "observed": {
@@ -255,7 +255,7 @@
       "id": "FN-P2",
       "category": "Functional/PCCase",
       "name": "Root transform moves/rotates all 13 parts",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "setAutoRotate(false); setModelTranslation(0.3,0,0) and compare every part worldMatrix translation column",
       "expected": "all 13 parts shift by exactly +0.3 in world X (translation is the last matrix applied)",
       "observed": {
@@ -296,7 +296,7 @@
       "id": "FN-P3",
       "category": "Functional/PCCase",
       "name": "Sub-assembly transform affects only its component group",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "setSubAssemblyTransform('front_panel',{translation:[0,0,0.32]}); compare world translations before/after",
       "expected": "exactly the 7 front_panel parts change; the other 6 are unchanged",
       "observed": {
@@ -325,7 +325,7 @@
       "id": "FN-P4",
       "category": "Functional/PCCase",
       "name": "Individual part transform affects only the selected part",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "setPartTransform('power_button',{translation:[0.14,0.6,0.6]}); compare all parts",
       "expected": "only power_button's worldMatrix changes",
       "observed": {
@@ -339,7 +339,7 @@
       "id": "FN-P5",
       "category": "Functional/PCCase",
       "name": "Component visibility changes draw-call count",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Hide side_glass_panel, then group 'accent', then restore all",
       "expected": "draws 13 → 12 → 10 → 13",
       "observed": {
@@ -356,7 +356,7 @@
       "id": "FN-P6",
       "category": "Functional/PCCase",
       "name": "Colour customisation changes GPU output, then Reset restores defaults",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "setPartColor('all','#ff0000') and sample pixel; then resetScene() and compare all parts with the initial snapshot",
       "expected": "R-dominant pixel at screen centre after change; after reset every part's id/transform/visibility/colour equals the snapshot",
       "observed": {
@@ -378,14 +378,14 @@
       "id": "FN-U1",
       "category": "Functional/Controls",
       "name": "Real DOM controls: scene selector, Auto-Rotate, Speed, Colour target/picker, Default Palette, Pause/Resume, Reset",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Drive each control through its DOM element/event and verify diagnostics + rotation rate",
       "expected": "each control changes the matching state; rotation rate ≈ configured speed; pause freezes frameCount; resume restarts; reset restores defaults",
       "observed": {
-        "rate45": 45.08206233422056,
+        "rate45": 45.119482243498815,
         "speedState": 90,
         "speedLabel": "90°/s",
-        "rate90": 90.01489572989723,
+        "rate90": 89.25273995361377,
         "autoRotateOff": {
           "autoRotate": false,
           "angleDelta": 0,
@@ -424,7 +424,7 @@
         },
         "resume": {
           "isRunning": true,
-          "framesAdvanced": 60,
+          "framesAdvanced": 58,
           "buttonText": "Pause Rendering"
         },
         "sceneCube": "cube",
@@ -441,7 +441,7 @@
       "id": "FN-U2",
       "category": "Functional/Controls",
       "name": "Cube face colour via UI (target '0' = +Z) reaches the GPU",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Cube scene, target Front(+Z), colour #00ff00, sample +Z face centre",
       "expected": "G-dominant pixel at +Z face centre",
       "observed": {
@@ -458,7 +458,7 @@
       "id": "LC-1",
       "category": "Lifecycle",
       "name": "Unsupported-WebGL fallback (?webgl=unsupported)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Open module with ?webgl=unsupported",
       "expected": "fallback overlay visible, no WebGL context created, no uncaught exceptions",
       "observed": {
@@ -483,7 +483,7 @@
       "id": "LC-2",
       "category": "Lifecycle",
       "name": "Shader compilation failure → error overlay → recoverable by Reset",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "testShaderCompileError(undefined,false) then (undefined,true); then resetScene()",
       "expected": "isolated test returns ok:false + info log; applied test shows #shader-error-overlay, stops loop; resetScene() hides overlay, resumes 13 draws",
       "observed": {
@@ -508,7 +508,7 @@
       "id": "LC-3",
       "category": "Lifecycle",
       "name": "GPU resource (buffer) allocation failure injected via gl.createBuffer override",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Override gl.createBuffer to return null on the live context; setMeshMode('triangle'); restore; resetScene()",
       "expected": "no uncaught exception; failure surfaced via overlay/diagnostics; loop not running without resources; recovery after restoring createBuffer + reset",
       "observed": {
@@ -534,7 +534,7 @@
       "id": "LC-4",
       "category": "Lifecycle",
       "name": "Context loss/restore while running (WEBGL_lose_context)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Customise (colour, sub-assembly, speed 90); loseContext(); restoreContext(); compare state & counters",
       "expected": "loop stops + overlay on loss; on restore GPU resources rebuilt (compile/alloc +1) and the user's pause/run preference, colour, sub-assembly and speed are preserved; no duplicate loop",
       "observed": {
@@ -561,7 +561,7 @@
           "draws": 13,
           "speed": 90,
           "mesh": "pccase",
-          "framesAdvanced": 73
+          "framesAdvanced": 70
         },
         "preserved": {
           "accentColour": [
@@ -569,15 +569,15 @@
             0,
             1
           ],
-          "frontBezelZ": -0.675
+          "frontBezelZ": -0.677
         },
         "loopRatio": {
-          "ownRaf": 218,
-          "stateFrames": 218,
+          "ownRaf": 217,
+          "stateFrames": 217,
           "ratio": 1,
-          "meanIntervalMs": 6.944239631336406,
+          "meanIntervalMs": 6.9444444444444455,
           "p95IntervalMs": 7.100000000000364,
-          "maxIntervalMs": 7.7000000000000455
+          "maxIntervalMs": 7.400000000000091
         }
       },
       "status": "Passed"
@@ -586,7 +586,7 @@
       "id": "LC-5",
       "category": "Lifecycle",
       "name": "Context loss/restore while PAUSED (WEBGL_lose_context)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Customise (colour, sub-assembly, speed 90); loseContext(); restoreContext(); compare state & counters",
       "expected": "loop stops + overlay on loss; on restore GPU resources rebuilt (compile/alloc +1) and the user's pause/run preference, colour, sub-assembly and speed are preserved; no duplicate loop",
       "observed": {
@@ -621,7 +621,7 @@
             0,
             1
           ],
-          "frontBezelZ": 0.617
+          "frontBezelZ": 0.667
         },
         "loopRatio": null
       },
@@ -631,7 +631,7 @@
       "id": "LC-6",
       "category": "Lifecycle",
       "name": "Scene switching: resource reuse vs rebuild (counters)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Record shaderCompileCount/geometryAllocCount across pccase→cube→pccase→triangle→pccase",
       "expected": "pccase↔cube reuse (Δ=0); switching to/from triangle rebuilds (observed Δ recorded)",
       "observed": {
@@ -689,16 +689,16 @@
       "id": "LC-7",
       "category": "Lifecycle",
       "name": "No duplicate rAF loops after stress (30 pause/resume, 30 scene switches, 10 resets)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Stress calls then measure loopRatio over 2 s",
       "expected": "ratio ≈ 1.0; single animationFrameId",
       "observed": {
-        "ownRaf": 290,
-        "stateFrames": 290,
+        "ownRaf": 288,
+        "stateFrames": 288,
         "ratio": 1,
-        "meanIntervalMs": 6.9435986159169545,
-        "p95IntervalMs": 7.100000000000136,
-        "maxIntervalMs": 7.400000000000091,
+        "meanIntervalMs": 6.993031358885017,
+        "p95IntervalMs": 7.100000000000023,
+        "maxIntervalMs": 13.900000000000091,
         "afId": true
       },
       "status": "Passed"
@@ -717,7 +717,7 @@
       "id": "RS-1",
       "category": "Responsive/DPR",
       "name": "Canvas CSS size, drawing buffer, viewport, aspect, DPR cap across 8 viewports × DPR {1,1.5,2,3} (fresh loads)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "For each combination read canvas CSS size, buffer size, gl.VIEWPORT, projection aspect (P[5]/P[0]), horizontal overflow, PC Case bounding box",
       "expected": "buffer = round(css × min(max(dpr,1),2)); viewport = [0,0,buffer]; projection aspect = buffer aspect (±0.01); no horizontal overflow; PC Case lit pixels > 0",
       "observed": {
@@ -727,107 +727,107 @@
           {
             "vp": "1920x1080",
             "dpr": 1,
-            "css": "1920x948",
-            "buffer": "1920x948",
+            "css": "1920x874",
+            "buffer": "1920x874",
             "effDpr": 1,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.571,
-            "pcCaseWidthFrac": 0.248
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.271
           },
           {
             "vp": "1440x900",
             "dpr": 1,
-            "css": "1440x693",
-            "buffer": "1440x693",
+            "css": "1440x694",
+            "buffer": "1440x694",
             "effDpr": 1,
-            "aspect": 2.0779,
-            "projAspect": 2.0779,
-            "instrumentBarH": 110,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 693,
+            "canvasStageH": 694,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.242
+            "pcCaseHeightFrac": 0.68,
+            "pcCaseWidthFrac": 0.287
           },
           {
             "vp": "1280x800",
             "dpr": 1,
-            "css": "1280x593",
-            "buffer": "1280x593",
+            "css": "1280x594",
+            "buffer": "1280x594",
             "effDpr": 1,
-            "aspect": 2.1585,
-            "projAspect": 2.1585,
-            "instrumentBarH": 110,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 593,
+            "canvasStageH": 594,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.234
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.277
           },
           {
             "vp": "1024x768",
             "dpr": 1,
-            "css": "1024x561",
-            "buffer": "1024x561",
+            "css": "1024x518",
+            "buffer": "1024x518",
             "effDpr": 1,
-            "aspect": 1.8253,
-            "projAspect": 1.8253,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.278
+            "pcCaseHeightFrac": 0.68,
+            "pcCaseWidthFrac": 0.303
           },
           {
             "vp": "768x1024",
             "dpr": 1,
-            "css": "768x786",
-            "buffer": "768x786",
+            "css": "768x713",
+            "buffer": "768x713",
             "effDpr": 1,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
+            "aspect": 1.0771,
+            "projAspect": 1.0771,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.517
+            "pcCaseHeightFrac": 0.68,
+            "pcCaseWidthFrac": 0.556
           },
           {
             "vp": "390x844",
             "dpr": 1,
-            "css": "390x506",
-            "buffer": "390x506",
+            "css": "390x434",
+            "buffer": "390x434",
             "effDpr": 1,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.656
+            "pcCaseHeightFrac": 0.684,
+            "pcCaseWidthFrac": 0.61
           },
           {
             "vp": "375x667",
             "dpr": 1,
-            "css": "375x323",
-            "buffer": "375x323",
+            "css": "375x236",
+            "buffer": "375x236",
             "effDpr": 1,
-            "aspect": 1.161,
-            "projAspect": 1.161,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
+            "aspect": 1.589,
+            "projAspect": 1.589,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.44
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.379
           },
           {
             "vp": "320x568",
@@ -837,117 +837,117 @@
             "effDpr": 1,
             "aspect": 1.7778,
             "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
             "canvasStageH": 180,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.284
+            "pcCaseHeightFrac": 0.672,
+            "pcCaseWidthFrac": 0.206
           },
           {
             "vp": "1920x1080",
             "dpr": 1.5,
-            "css": "1920x948",
-            "buffer": "2880x1422",
+            "css": "1920x874",
+            "buffer": "2880x1311",
             "effDpr": 1.5,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.571,
-            "pcCaseWidthFrac": 0.248
+            "pcCaseHeightFrac": 0.684,
+            "pcCaseWidthFrac": 0.244
           },
           {
             "vp": "1440x900",
             "dpr": 1.5,
-            "css": "1440x693",
-            "buffer": "2160x1040",
+            "css": "1440x694",
+            "buffer": "2160x1041",
             "effDpr": 1.5,
-            "aspect": 2.0769,
-            "projAspect": 2.0769,
-            "instrumentBarH": 110,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 693,
+            "canvasStageH": 694,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.573,
-            "pcCaseWidthFrac": 0.238
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.289
           },
           {
             "vp": "1280x800",
             "dpr": 1.5,
-            "css": "1280x593",
-            "buffer": "1920x890",
+            "css": "1280x594",
+            "buffer": "1920x891",
             "effDpr": 1.5,
-            "aspect": 2.1573,
-            "projAspect": 2.1573,
-            "instrumentBarH": 110,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 593,
+            "canvasStageH": 594,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.571,
-            "pcCaseWidthFrac": 0.234
+            "pcCaseHeightFrac": 0.68,
+            "pcCaseWidthFrac": 0.277
           },
           {
             "vp": "1024x768",
             "dpr": 1.5,
-            "css": "1024x561",
-            "buffer": "1536x842",
+            "css": "1024x518",
+            "buffer": "1536x777",
             "effDpr": 1.5,
-            "aspect": 1.8242,
-            "projAspect": 1.8242,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.278
+            "pcCaseHeightFrac": 0.682,
+            "pcCaseWidthFrac": 0.298
           },
           {
             "vp": "768x1024",
             "dpr": 1.5,
-            "css": "768x786",
-            "buffer": "1152x1179",
+            "css": "768x713",
+            "buffer": "1152x1070",
             "effDpr": 1.5,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
+            "aspect": 1.0766,
+            "projAspect": 1.0766,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.516
+            "pcCaseHeightFrac": 0.683,
+            "pcCaseWidthFrac": 0.529
           },
           {
             "vp": "390x844",
             "dpr": 1.5,
-            "css": "390x506",
-            "buffer": "585x759",
+            "css": "390x434",
+            "buffer": "585x651",
             "effDpr": 1.5,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.655
+            "pcCaseHeightFrac": 0.684,
+            "pcCaseWidthFrac": 0.641
           },
           {
             "vp": "375x667",
             "dpr": 1.5,
-            "css": "375x323",
-            "buffer": "563x485",
+            "css": "375x236",
+            "buffer": "563x354",
             "effDpr": 1.5,
-            "aspect": 1.1608,
-            "projAspect": 1.1608,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
+            "aspect": 1.5904,
+            "projAspect": 1.5904,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.439
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.378
           },
           {
             "vp": "320x568",
@@ -957,237 +957,237 @@
             "effDpr": 1.5,
             "aspect": 1.7778,
             "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
             "canvasStageH": 180,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.329
+          },
+          {
+            "vp": "1920x1080",
+            "dpr": 2,
+            "css": "1920x874",
+            "buffer": "3840x1748",
+            "effDpr": 2,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.271
+          },
+          {
+            "vp": "1440x900",
+            "dpr": 2,
+            "css": "1440x694",
+            "buffer": "2880x1388",
+            "effDpr": 2,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 694,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.286
+          },
+          {
+            "vp": "1280x800",
+            "dpr": 2,
+            "css": "1280x594",
+            "buffer": "2560x1188",
+            "effDpr": 2,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 594,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.68,
+            "pcCaseWidthFrac": 0.275
+          },
+          {
+            "vp": "1024x768",
+            "dpr": 2,
+            "css": "1024x518",
+            "buffer": "2048x1036",
+            "effDpr": 2,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.298
+          },
+          {
+            "vp": "768x1024",
+            "dpr": 2,
+            "css": "768x713",
+            "buffer": "1536x1426",
+            "effDpr": 2,
+            "aspect": 1.0771,
+            "projAspect": 1.0771,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.68,
+            "pcCaseWidthFrac": 0.553
+          },
+          {
+            "vp": "390x844",
+            "dpr": 2,
+            "css": "390x434",
+            "buffer": "780x868",
+            "effDpr": 2,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.677,
+            "pcCaseWidthFrac": 0.671
+          },
+          {
+            "vp": "375x667",
+            "dpr": 2,
+            "css": "375x236",
+            "buffer": "750x472",
+            "effDpr": 2,
+            "aspect": 1.589,
+            "projAspect": 1.589,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.379
+          },
+          {
+            "vp": "320x568",
+            "dpr": 2,
+            "css": "320x180",
+            "buffer": "640x360",
+            "effDpr": 2,
+            "aspect": 1.7778,
+            "projAspect": 1.7778,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
+            "canvasStageH": 180,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.338
+          },
+          {
+            "vp": "1920x1080",
+            "dpr": 3,
+            "css": "1920x874",
+            "buffer": "3840x1748",
+            "effDpr": 2,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.683,
+            "pcCaseWidthFrac": 0.263
+          },
+          {
+            "vp": "1440x900",
+            "dpr": 3,
+            "css": "1440x694",
+            "buffer": "2880x1388",
+            "effDpr": 2,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 694,
+            "controlsOutsideViewport": [],
+            "pcCaseHeightFrac": 0.681,
             "pcCaseWidthFrac": 0.285
           },
           {
-            "vp": "1920x1080",
-            "dpr": 2,
-            "css": "1920x948",
-            "buffer": "3840x1896",
-            "effDpr": 2,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.574,
-            "pcCaseWidthFrac": 0.237
-          },
-          {
-            "vp": "1440x900",
-            "dpr": 2,
-            "css": "1440x693",
-            "buffer": "2880x1386",
-            "effDpr": 2,
-            "aspect": 2.0779,
-            "projAspect": 2.0779,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 693,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.572,
-            "pcCaseWidthFrac": 0.189
-          },
-          {
             "vp": "1280x800",
-            "dpr": 2,
-            "css": "1280x593",
-            "buffer": "2560x1186",
+            "dpr": 3,
+            "css": "1280x594",
+            "buffer": "2560x1188",
             "effDpr": 2,
-            "aspect": 2.1585,
-            "projAspect": 2.1585,
-            "instrumentBarH": 110,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 593,
+            "canvasStageH": 594,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.574,
-            "pcCaseWidthFrac": 0.219
-          },
-          {
-            "vp": "1024x768",
-            "dpr": 2,
-            "css": "1024x561",
-            "buffer": "2048x1122",
-            "effDpr": 2,
-            "aspect": 1.8253,
-            "projAspect": 1.8253,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
+            "pcCaseHeightFrac": 0.679,
             "pcCaseWidthFrac": 0.277
           },
           {
-            "vp": "768x1024",
-            "dpr": 2,
-            "css": "768x786",
-            "buffer": "1536x1572",
-            "effDpr": 2,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.572,
-            "pcCaseWidthFrac": 0.512
-          },
-          {
-            "vp": "390x844",
-            "dpr": 2,
-            "css": "390x506",
-            "buffer": "780x1012",
-            "effDpr": 2,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.653
-          },
-          {
-            "vp": "375x667",
-            "dpr": 2,
-            "css": "375x323",
-            "buffer": "750x646",
-            "effDpr": 2,
-            "aspect": 1.161,
-            "projAspect": 1.161,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.436
-          },
-          {
-            "vp": "320x568",
-            "dpr": 2,
-            "css": "320x180",
-            "buffer": "640x360",
-            "effDpr": 2,
-            "aspect": 1.7778,
-            "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
-            "canvasStageH": 180,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.284
-          },
-          {
-            "vp": "1920x1080",
-            "dpr": 3,
-            "css": "1920x948",
-            "buffer": "3840x1896",
-            "effDpr": 2,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.574,
-            "pcCaseWidthFrac": 0.241
-          },
-          {
-            "vp": "1440x900",
-            "dpr": 3,
-            "css": "1440x693",
-            "buffer": "2880x1386",
-            "effDpr": 2,
-            "aspect": 2.0779,
-            "projAspect": 2.0779,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 693,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.242
-          },
-          {
-            "vp": "1280x800",
-            "dpr": 3,
-            "css": "1280x593",
-            "buffer": "2560x1186",
-            "effDpr": 2,
-            "aspect": 2.1585,
-            "projAspect": 2.1585,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 593,
-            "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.233
-          },
-          {
             "vp": "1024x768",
             "dpr": 3,
-            "css": "1024x561",
-            "buffer": "2048x1122",
+            "css": "1024x518",
+            "buffer": "2048x1036",
             "effDpr": 2,
-            "aspect": 1.8253,
-            "projAspect": 1.8253,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.276
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.299
           },
           {
             "vp": "768x1024",
             "dpr": 3,
-            "css": "768x786",
-            "buffer": "1536x1572",
+            "css": "768x713",
+            "buffer": "1536x1426",
             "effDpr": 2,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
+            "aspect": 1.0771,
+            "projAspect": 1.0771,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.519
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.551
           },
           {
             "vp": "390x844",
             "dpr": 3,
-            "css": "390x506",
-            "buffer": "780x1012",
+            "css": "390x434",
+            "buffer": "780x868",
             "effDpr": 2,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.656
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.663
           },
           {
             "vp": "375x667",
             "dpr": 3,
-            "css": "375x323",
-            "buffer": "750x646",
+            "css": "375x236",
+            "buffer": "750x472",
             "effDpr": 2,
-            "aspect": 1.161,
-            "projAspect": 1.161,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
+            "aspect": 1.589,
+            "projAspect": 1.589,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.435
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.376
           },
           {
             "vp": "320x568",
@@ -1197,12 +1197,12 @@
             "effDpr": 2,
             "aspect": 1.7778,
             "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
             "canvasStageH": 180,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.564,
-            "pcCaseWidthFrac": 0.177
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.333
           }
         ]
       },
@@ -1212,135 +1212,135 @@
       "id": "RS-2",
       "category": "Responsive/DPR",
       "name": "Live resize (no reload) tracks container, viewport and aspect",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "On one loaded page sweep the 8 viewports (DPR 1) via emulation resize; read state after each",
       "expected": "buffer == css at DPR 1; viewport == buffer; projection aspect == buffer aspect; canvas non-blank",
       "observed": [
         {
           "css": [
             1920,
-            948
+            874
           ],
           "buf": [
             1920,
-            948
+            874
           ],
           "vp": [
             0,
             0,
             1920,
-            948
+            874
           ],
           "aspectErr": 0,
-          "lit": 156024
+          "lit": 184327
         },
         {
           "css": [
             1440,
-            693
+            694
           ],
           "buf": [
             1440,
-            693
+            694
           ],
           "vp": [
             0,
             0,
             1440,
-            693
+            694
           ],
           "aspectErr": 0,
-          "lit": 71497
+          "lit": 95319
         },
         {
           "css": [
             1280,
-            593
+            594
           ],
           "buf": [
             1280,
-            593
+            594
           ],
           "vp": [
             0,
             0,
             1280,
-            593
+            594
           ],
           "aspectErr": 0,
-          "lit": 42412
+          "lit": 60739
         },
         {
           "css": [
             1024,
-            561
+            518
           ],
           "buf": [
             1024,
-            561
+            518
           ],
           "vp": [
             0,
             0,
             1024,
-            561
+            518
           ],
           "aspectErr": 0,
-          "lit": 43919
+          "lit": 58791
         },
         {
           "css": [
             768,
-            786
+            713
           ],
           "buf": [
             768,
-            786
+            713
           ],
           "vp": [
             0,
             0,
             768,
-            786
+            713
           ],
           "aspectErr": 0,
-          "lit": 102578
+          "lit": 125812
         },
         {
           "css": [
             390,
-            506
+            434
           ],
           "buf": [
             390,
-            506
+            434
           ],
           "vp": [
             0,
             0,
             390,
-            506
+            434
           ],
           "aspectErr": 0,
-          "lit": 45999
+          "lit": 48494
         },
         {
           "css": [
             375,
-            323
+            236
           ],
           "buf": [
             375,
-            323
+            236
           ],
           "vp": [
             0,
             0,
             375,
-            323
+            236
           ],
           "aspectErr": 0,
-          "lit": 18969
+          "lit": 14653
         },
         {
           "css": [
@@ -1358,25 +1358,25 @@
             180
           ],
           "aspectErr": 0,
-          "lit": 5959
+          "lit": 8270
         },
         {
           "css": [
             1280,
-            593
+            594
           ],
           "buf": [
             1280,
-            593
+            594
           ],
           "vp": [
             0,
             0,
             1280,
-            593
+            594
           ],
           "aspectErr": 0,
-          "lit": 64270
+          "lit": 91624
         }
       ],
       "status": "Passed"
@@ -1385,36 +1385,36 @@
       "id": "RS-3",
       "category": "Responsive/DPR",
       "name": "Narrow-viewport usability (measured, standalone DPR 1)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Measure instrument bar, control panel and canvas heights at 390x844, 375x667, 320x568; check PC Case bbox and controls inside viewport",
       "expected": "Controls reachable (no horizontal overflow, none outside viewport); PC Case lit area present. Canvas height is recorded as a limitation indicator",
       "observed": [
         {
           "vp": "390x844",
-          "instrumentBarH": 159,
-          "controlPanelH": 179,
-          "canvasH": 506,
-          "canvasFracOfViewport": 0.6,
+          "instrumentBarH": 147,
+          "controlPanelH": 263,
+          "canvasH": 434,
+          "canvasFracOfViewport": 0.514,
           "controlsOutsideViewport": [],
-          "pcCaseHeightFracOfCanvas": 0.569
+          "pcCaseHeightFracOfCanvas": 0.684
         },
         {
           "vp": "375x667",
-          "instrumentBarH": 159,
-          "controlPanelH": 185,
-          "canvasH": 323,
-          "canvasFracOfViewport": 0.484,
+          "instrumentBarH": 168,
+          "controlPanelH": 263,
+          "canvasH": 236,
+          "canvasFracOfViewport": 0.354,
           "controlsOutsideViewport": [],
-          "pcCaseHeightFracOfCanvas": 0.567
+          "pcCaseHeightFracOfCanvas": 0.678
         },
         {
           "vp": "320x568",
-          "instrumentBarH": 183,
-          "controlPanelH": 215,
+          "instrumentBarH": 189,
+          "controlPanelH": 263,
           "canvasH": 180,
           "canvasFracOfViewport": 0.317,
           "controlsOutsideViewport": [],
-          "pcCaseHeightFracOfCanvas": 0.567
+          "pcCaseHeightFracOfCanvas": 0.672
         }
       ],
       "status": "Passed"
@@ -1423,7 +1423,7 @@
       "id": "PI-1",
       "category": "Portal",
       "name": "Direct #/module1: iframe load event vs WebGL initialisation vs first rendered frames",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Open /index.html#/module1 @1440x900; record time to iframe load and to frameCount>2; check overlays",
       "expected": "iframe src ./modules/module1-webgl/index.html; loading/error overlays hidden; WebGL active; frames advancing; 13 draws",
       "observed": {
@@ -1432,14 +1432,14 @@
         "overlayErrorHidden": true,
         "hash": "#/module1",
         "hasWebGL2": true,
-        "frameCount": 75,
+        "frameCount": 69,
         "status": "WebGL 2.0 Active",
         "draws": 13,
         "canvas": [
           1094,
-          341,
+          342,
           1094,
-          341
+          342
         ],
         "timing": {
           "loadAtMsAfterScript": 0,
@@ -1452,7 +1452,7 @@
       "id": "PI-2",
       "category": "Portal",
       "name": "Overview → Module 1 via sidebar link",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Open index.html (#/), click .nav-item[data-nav-route='#/module1']",
       "expected": "hash becomes #/module1; module view shown; WebGL active in iframe",
       "observed": {
@@ -1466,14 +1466,14 @@
           "overlayErrorHidden": true,
           "hash": "#/module1",
           "hasWebGL2": true,
-          "frameCount": 72,
+          "frameCount": 70,
           "status": "WebGL 2.0 Active",
           "draws": 13,
           "canvas": [
             1094,
-            341,
+            342,
             1094,
-            341
+            342
           ]
         }
       },
@@ -1483,7 +1483,7 @@
       "id": "PI-3",
       "category": "Portal",
       "name": "Module 1 → Module 2 → Module 1: teardown (pagehide/destroy) and fresh single-loop re-entry",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Install pagehide spy in module doc; click Module 2 then Module 1 links; inspect spy and new document",
       "expected": "old document received pagehide and destroyed GPU resources/loop (no program, no rAF id); new document fresh (compile=1), single loop ratio ≈ 1",
       "observed": {
@@ -1515,12 +1515,12 @@
       "id": "PI-4",
       "category": "Portal",
       "name": "Module Reload button",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Click #module-reload-btn; inspect the new document",
       "expected": "iframe reloads (new window object, frameCount restarts, compile=1), WebGL active, single loop",
       "observed": {
         "newDocIsDifferent": true,
-        "framesBefore": 298,
+        "framesBefore": 302,
         "compiles": 1,
         "draws": 13,
         "loopRatio": 1,
@@ -1535,14 +1535,14 @@
       "id": "PI-5",
       "category": "Portal",
       "name": "Hidden-iframe behaviour: leave module route to Overview (iframe kept alive) and return",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Click Overview; sample module frameCount/canvas for 1 s while hidden; click Module 1 again",
       "expected": "Observation test: records whether frames continue while hidden, the canvas size while hidden and that rendering/size recover on return",
       "observed": {
         "whileHidden": {
           "hash": "#/",
           "moduleViewHidden": true,
-          "framesWhileHidden": 144,
+          "framesWhileHidden": 142,
           "canvasWhileHidden": [
             1,
             1,
@@ -1555,12 +1555,12 @@
         "afterReturn": {
           "canvas": [
             1094,
-            341,
+            342,
             1094,
-            341
+            342
           ],
-          "litPixels": 21225,
-          "bboxHeightFrac": 0.499,
+          "litPixels": 28281,
+          "bboxHeightFrac": 0.623,
           "loopRatio": 1,
           "newDocument": 1
         }
@@ -1571,7 +1571,7 @@
       "id": "PI-6",
       "category": "Portal",
       "name": "Desktop sidebar collapse/expand keeps aspect ratio and rendering",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "At 1440x900 click #sidebar-collapse-btn twice; read iframe canvas CSS size/buffer/aspect each time",
       "expected": "canvas width grows when collapsed and shrinks back; buffer == css (DPR 1); projection aspect tracks width/height; PC Case still lit",
       "observed": {
@@ -1579,43 +1579,43 @@
           "collapsed": false,
           "canvasCss": [
             1094,
-            341
+            342
           ],
           "buffer": [
             1094,
-            341
+            342
           ],
-          "aspectBuffer": 3.2082,
-          "aspectProj": 3.2082,
-          "lit": 16130
+          "aspectBuffer": 3.1988,
+          "aspectProj": 3.1988,
+          "lit": 27985
         },
         "collapsed": {
           "collapsed": true,
           "canvasCss": [
             1302,
-            341
+            342
           ],
           "buffer": [
             1302,
-            341
+            342
           ],
-          "aspectBuffer": 3.8182,
-          "aspectProj": 3.8182,
-          "lit": 20709
+          "aspectBuffer": 3.807,
+          "aspectProj": 3.807,
+          "lit": 30520
         },
         "expandedAgain": {
           "collapsed": false,
           "canvasCss": [
             1094,
-            341
+            342
           ],
           "buffer": [
             1094,
-            341
+            342
           ],
-          "aspectBuffer": 3.2082,
-          "aspectProj": 3.2082,
-          "lit": 21102
+          "aspectBuffer": 3.1988,
+          "aspectProj": 3.1988,
+          "lit": 30375
         }
       },
       "status": "Passed"
@@ -1624,7 +1624,7 @@
       "id": "PI-7",
       "category": "Portal",
       "name": "Mobile drawer open/close (390x844) and canvas after close",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Set 390x844 mobile emulation; click #menu-toggle-btn; verify #sidebar.is-open; close via #sidebar-close-btn and via Escape; read canvas",
       "expected": "drawer opens/closes (button + Escape); module canvas stays valid and rendering",
       "observed": {
@@ -1637,13 +1637,13 @@
           356,
           180
         ],
-        "lit": 5499,
-        "pcCaseHeightFrac": 0.572,
+        "lit": 6124,
+        "pcCaseHeightFrac": 0.667,
         "layoutInsideIframe": {
           "innerW": 356,
           "innerH": 440,
-          "instrumentBarH": 159,
-          "controlPanelH": 185,
+          "instrumentBarH": 168,
+          "controlPanelH": 263,
           "canvasStageH": 180,
           "hScrollOverflowPx": 0,
           "controlsOutsideViewport": []
@@ -1659,7 +1659,7 @@
       "id": "PI-8",
       "category": "Portal",
       "name": "Refresh while #/module1 is active",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Page.reload on #/module1 @1440x900",
       "expected": "route preserved; iframe reloaded; WebGL active again",
       "observed": {
@@ -1668,14 +1668,14 @@
         "overlayErrorHidden": true,
         "hash": "#/module1",
         "hasWebGL2": true,
-        "frameCount": 85,
+        "frameCount": 81,
         "status": "WebGL 2.0 Active",
         "draws": 13,
         "canvas": [
           1094,
-          341,
+          342,
           1094,
-          341
+          342
         ]
       },
       "status": "Passed"
@@ -1684,7 +1684,7 @@
       "id": "PI-9",
       "category": "Portal",
       "name": "Viewport sweep inside the Portal (iframe canvas dimensions)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Resize through the 8 viewports on #/module1 and read the iframe canvas",
       "expected": "canvas non-trivial and buffer == css at DPR 1; PC Case lit; no horizontal overflow in iframe document",
       "observed": [
@@ -1696,14 +1696,14 @@
           ],
           "canvasCss": [
             1574,
-            565
+            522
           ],
           "buffer": [
             1574,
-            565
+            522
           ],
-          "lit": 43873,
-          "pcCaseHeightFrac": 0.563,
+          "lit": 50425,
+          "pcCaseHeightFrac": 0.665,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1715,14 +1715,14 @@
           ],
           "canvasCss": [
             1094,
-            341
+            342
           ],
           "buffer": [
             1094,
-            341
+            342
           ],
-          "lit": 15235,
-          "pcCaseHeightFrac": 0.56,
+          "lit": 23575,
+          "pcCaseHeightFrac": 0.673,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1734,14 +1734,14 @@
           ],
           "canvasCss": [
             919,
-            302
+            260
           ],
           "buffer": [
             919,
-            302
+            260
           ],
-          "lit": 15335,
-          "pcCaseHeightFrac": 0.576,
+          "lit": 16823,
+          "pcCaseHeightFrac": 0.685,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1752,15 +1752,15 @@
             540
           ],
           "canvasCss": [
-            663,
-            285
+            648,
+            200
           ],
           "buffer": [
-            663,
-            285
+            648,
+            200
           ],
-          "lit": 14771,
-          "pcCaseHeightFrac": 0.568,
+          "lit": 10372,
+          "pcCaseHeightFrac": 0.67,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1772,14 +1772,14 @@
           ],
           "canvasCss": [
             718,
-            407
+            229
           ],
           "buffer": [
             718,
-            407
+            229
           ],
-          "lit": 30294,
-          "pcCaseHeightFrac": 0.543,
+          "lit": 13549,
+          "pcCaseHeightFrac": 0.633,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1797,8 +1797,8 @@
             356,
             180
           ],
-          "lit": 5980,
-          "pcCaseHeightFrac": 0.511,
+          "lit": 8401,
+          "pcCaseHeightFrac": 0.6,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1816,8 +1816,8 @@
             341,
             180
           ],
-          "lit": 5705,
-          "pcCaseHeightFrac": 0.511,
+          "lit": 7742,
+          "pcCaseHeightFrac": 0.628,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1835,8 +1835,8 @@
             286,
             180
           ],
-          "lit": 4823,
-          "pcCaseHeightFrac": 0.517,
+          "lit": 6174,
+          "pcCaseHeightFrac": 0.628,
           "hOverflow": 0,
           "controlsOutside": []
         }
@@ -1857,7 +1857,7 @@
       "id": "PF-1",
       "category": "Performance",
       "name": "Per-mode measurements (1280x800, DPR 1, 3 s rAF window + 200-iteration CPU loops)",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP; WebGL renderer: ANGLE (Intel, Intel(R) UHD Graphics (0x00009A68) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP; WebGL renderer: ANGLE (Intel, Intel(R) UHD Graphics (0x00009A68) Direct3D11 vs_5_0 ps_5_0, D3D11)",
       "procedure": "setMeshMode(mode); independent rAF interval statistics; average CPU time of 200 × stepAnimationBySeconds (JS update + draw submission + telemetry DOM write) and 200 × sampleCenterPixel (draw submission + synchronous readPixels, which forces the GPU/driver to finish the frame)",
       "expected": "Recorded values only (no pass threshold): used to compare modes and to show measurement limits",
       "observed": {
@@ -1869,14 +1869,14 @@
           "eboBytes": 0,
           "buffer": [
             1280,
-            593
+            594
           ],
           "rafMeanIntervalMs": 6.94,
           "rafP95IntervalMs": 7.1,
-          "rafMaxIntervalMs": 7.5,
+          "rafMaxIntervalMs": 7.3,
           "framesIn3s": 433,
-          "cpuUpdateSubmitMsPerFrame": 0.053,
-          "cpuSubmitPlusReadPixelsMsPerFrame": 2.415
+          "cpuUpdateSubmitMsPerFrame": 0.069,
+          "cpuSubmitPlusReadPixelsMsPerFrame": 3.541
         },
         "cube": {
           "drawCalls": 1,
@@ -1886,14 +1886,14 @@
           "eboBytes": 72,
           "buffer": [
             1280,
-            593
+            594
           ],
           "rafMeanIntervalMs": 6.94,
           "rafP95IntervalMs": 7.1,
-          "rafMaxIntervalMs": 7.3,
+          "rafMaxIntervalMs": 7.6,
           "framesIn3s": 434,
-          "cpuUpdateSubmitMsPerFrame": 0.027,
-          "cpuSubmitPlusReadPixelsMsPerFrame": 1.778
+          "cpuUpdateSubmitMsPerFrame": 0.089,
+          "cpuSubmitPlusReadPixelsMsPerFrame": 3.64
         },
         "pccase": {
           "drawCalls": 13,
@@ -1903,29 +1903,29 @@
           "eboBytes": 72,
           "buffer": [
             1280,
-            593
+            594
           ],
           "rafMeanIntervalMs": 6.94,
           "rafP95IntervalMs": 7.1,
-          "rafMaxIntervalMs": 7.5,
+          "rafMaxIntervalMs": 7.3,
           "framesIn3s": 434,
-          "cpuUpdateSubmitMsPerFrame": 0.048,
-          "cpuSubmitPlusReadPixelsMsPerFrame": 2.347
+          "cpuUpdateSubmitMsPerFrame": 0.108,
+          "cpuSubmitPlusReadPixelsMsPerFrame": 4.455
         },
         "timerQuery": {
           "available": true,
           "out": [
             {
               "mode": "triangle",
-              "gpuNs": 293281
+              "gpuNs": 663177
             },
             {
               "mode": "cube",
-              "gpuNs": 256718
+              "gpuNs": 258645
             },
             {
               "mode": "pccase",
-              "gpuNs": 536874
+              "gpuNs": 279531
             }
           ]
         }
@@ -1936,7 +1936,7 @@
       "id": "PF-2",
       "category": "Performance",
       "name": "EXT_disjoint_timer_query_webgl2 GPU timing",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Wrap one frame in a TIME_ELAPSED query for each mode",
       "expected": "GPU nanoseconds if the extension exists",
       "observed": {
@@ -1944,15 +1944,15 @@
         "out": [
           {
             "mode": "triangle",
-            "gpuNs": 293281
+            "gpuNs": 663177
           },
           {
             "mode": "cube",
-            "gpuNs": 256718
+            "gpuNs": 258645
           },
           {
             "mode": "pccase",
-            "gpuNs": 536874
+            "gpuNs": 279531
           }
         ]
       },
@@ -1962,7 +1962,7 @@
       "id": "CE-1",
       "category": "Console",
       "name": "No unexpected console errors / uncaught exceptions during all non-fault-injection phases",
-      "env": "edge Edg/157.0.4341.42, headless(new), CDP",
+      "env": "edge Edg/157.0.4341.46, headless(new), CDP",
       "procedure": "Collected Runtime.consoleAPICalled(error), Runtime.exceptionThrown and Log.entryAdded(error) per phase",
       "expected": "empty (fault-injection phase 'lifecycle-expected' excluded; favicon.ico excluded)",
       "observed": {
