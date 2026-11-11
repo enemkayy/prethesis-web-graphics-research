@@ -104,16 +104,53 @@
   });
 
   /**
-   * Default fixed Camera and Perspective Projection parameters.
+   * Scene-Specific Camera Framing Presets.
+   *
+   * WHY SCENE-SPECIFIC CAMERA FRAMING?
+   * ----------------------------------
+   * In 3D graphics research, different models possess distinct bounding-box
+   * proportions. Rather than modifying the underlying research geometry or
+   * applying artificial CSS scale transforms (which would break pixel-ratio
+   * fidelity and NDC math), we adjust the virtual camera distance:
+   *   - PC Case: height ~1.28, width ~0.58, depth ~1.11. Bounding cylinder radius ~0.65.
+   *     Placing eye at [1.60, 1.25, 2.20] (distance ~3.00) makes the PC case occupy
+   *     ~51% of canvas height on desktop and ~55-60% on mobile without clipping
+   *     its diagonal silhouette during full 360-degree rotation.
+   *   - Reference Cube: canonical 1.0 x 1.0 x 1.0 box.
+   *     Placing eye at [1.35, 1.10, 1.85] (distance ~2.54) enlarges the cube to
+   *     occupy ~48% of canvas height (up from ~34%), making face colors, edges,
+   *     and depth occlusion crisply observable.
+   *   - 2D Triangle: clip-space coordinates directly pass through to NDC; camera
+   *     position does not alter its rasterized size.
    */
-  const DEFAULT_CAMERA_PARAMS = Object.freeze({
-    eye: [1.9, 1.5, 2.6],
-    target: [0.0, 0.0, 0.0],
-    up: [0.0, 1.0, 0.0],
-    fovYDeg: 45.0,
-    zNear: 0.1,
-    zFar: 50.0,
+  const SCENE_CAMERA_PRESETS = Object.freeze({
+    pccase: Object.freeze({
+      eye: [1.60, 1.25, 2.20],
+      target: [0.0, 0.0, 0.0],
+      up: [0.0, 1.0, 0.0],
+      fovYDeg: 45.0,
+      zNear: 0.1,
+      zFar: 50.0,
+    }),
+    cube: Object.freeze({
+      eye: [1.35, 1.10, 1.85],
+      target: [0.0, 0.0, 0.0],
+      up: [0.0, 1.0, 0.0],
+      fovYDeg: 45.0,
+      zNear: 0.1,
+      zFar: 50.0,
+    }),
+    triangle: Object.freeze({
+      eye: [1.60, 1.25, 2.20],
+      target: [0.0, 0.0, 0.0],
+      up: [0.0, 1.0, 0.0],
+      fovYDeg: 45.0,
+      zNear: 0.1,
+      zFar: 50.0,
+    }),
   });
+
+  const DEFAULT_CAMERA_PARAMS = SCENE_CAMERA_PRESETS.pccase;
 
   /**
    * Task 3.4 Time-Based Animation Constants.
@@ -426,6 +463,25 @@
   }
 
   /**
+   * Formats 3 Euler rotation angles in degrees with an invariant 21-character width
+   * (e.g. `(  18°,  -28°,    0°)`), ensuring the telemetry chip's intrinsic text width
+   * remains strictly constant throughout continuous animation and prevents flex-wrap
+   * row jumping or vertical layout shifts.
+   *
+   * Each angle is formatted as a 5-character right-aligned cell (`-180°` to `   0°`),
+   * producing exactly 21 characters: `(` + 5 + `, ` + 5 + `, ` + 5 + `)`.
+   *
+   * @param {number} rx X-axis Euler angle in degrees
+   * @param {number} ry Y-axis Euler angle in degrees
+   * @param {number} rz Z-axis Euler angle in degrees
+   * @returns {string} 21-character fixed-width formatted Euler angle readout
+   */
+  function formatEulerRotation(rx, ry, rz) {
+    const formatAngle = (deg) => `${Math.round(deg)}°`.padStart(5, " ");
+    return `(${formatAngle(rx)}, ${formatAngle(ry)}, ${formatAngle(rz)})`;
+  }
+
+  /**
    * Recomputes `state.modelMatrix` from `state.modelParams` (`M = T * Rz * Ry * Rx * S`).
    *
    * WHY UPDATE `u_modelMatrix` DURING ANIMATION INSTEAD OF VBO VERTICES?
@@ -563,7 +619,7 @@
     }
     if (telemetryRotation) {
       const [rx, ry, rz] = state.modelParams.rotationDeg;
-      telemetryRotation.textContent = `(${Math.round(rx)}°, ${Math.round(ry)}°, ${Math.round(rz)}°)`;
+      telemetryRotation.textContent = formatEulerRotation(rx, ry, rz);
     }
     if (telemetryCamera) {
       const fov = state.cameraParams.fovYDeg.toFixed(0);
@@ -586,17 +642,17 @@
           (p) => p.visible
         ).length;
         stageCaptionTitle.textContent =
-          "Task 3.5 Composite PC Case · 1 Shared Cube VAO (24v/36i) × 13 Hierarchical Parts";
-        stageCaptionText.textContent = `${visibleParts} × gl.drawElements(gl.${state.primitiveModeName}, 36, gl.UNSIGNED_SHORT, 0) · M_world = M_root × M_local · ${rotModeLabel}`;
+          "Composite PC Case · Shared Cube Geometry";
+        stageCaptionText.textContent = `${visibleParts} Draw Calls · Hierarchical Model Transforms · ${rotModeLabel}`;
       } else if (state.geometry && state.geometry.indexed) {
         stageCaptionTitle.textContent =
-          "GLSL ES 3.00 3D Pipeline · VAO + VBO (24v) + EBO (Uint16Array 36i)";
-        stageCaptionText.textContent = `gl.drawElements(gl.${state.primitiveModeName}, ${state.geometry.indexCount}, gl.UNSIGNED_SHORT, 0) · ${rotModeLabel}`;
+          "Reference 3D Cube · Indexed Geometry";
+        stageCaptionText.textContent = `1 Draw Call (gl.drawElements) · 36 Indices (12 Triangles) · Depth Test · ${rotModeLabel}`;
       } else {
         const vCount = state.geometry ? state.geometry.vertexCount : 3;
         stageCaptionTitle.textContent =
-          "GLSL ES 3.00 Pipeline · VAO + Interleaved VBO (Float32Array)";
-        stageCaptionText.textContent = `gl.drawArrays(gl.${state.primitiveModeName}, 0, ${vCount}) · Attributes: a_position (loc 0), a_color (loc 1)`;
+          "2D Triangle · Clip-Space Primitive";
+        stageCaptionText.textContent = `1 Draw Call (gl.drawArrays) · ${vCount} Vertices · Barycentric Color Interpolation`;
       }
     }
   }
@@ -1217,7 +1273,7 @@
       }
       if (telemetryRotation) {
         const [rx, ry, rz] = state.modelParams.rotationDeg;
-        telemetryRotation.textContent = `(${Math.round(rx)}°, ${Math.round(ry)}°, ${Math.round(rz)}°)`;
+        telemetryRotation.textContent = formatEulerRotation(rx, ry, rz);
       }
     }
   }
@@ -1506,7 +1562,7 @@
       normalized !== "triangle"
     ) {
       throw new Error(
-        `Unsupported meshMode "${mode}". Choose "pccase" (Task 3.5), "cube" (Task 3.3), or "triangle" (Task 3.2).`
+        `Unsupported meshMode "${mode}". Choose "pccase", "cube", or "triangle".`
       );
     }
 
@@ -1519,6 +1575,16 @@
       targetMeshType === "cube";
 
     state.meshMode = /** @type {"pccase" | "cube" | "triangle"} */ (normalized);
+
+    // Apply scene-specific camera framing to optimize model visual prominence
+    const cameraPreset =
+      SCENE_CAMERA_PRESETS[normalized] || SCENE_CAMERA_PRESETS.pccase;
+    state.cameraParams.eye = [...cameraPreset.eye];
+    state.cameraParams.target = [...cameraPreset.target];
+    state.cameraParams.up = [...cameraPreset.up];
+    state.cameraParams.fovYDeg = cameraPreset.fovYDeg;
+    updateViewMatrix();
+    updateProjectionMatrix();
 
     if (state.gl && !state.isContextLost) {
       if (!canReuseExistingCubeGeometry) {

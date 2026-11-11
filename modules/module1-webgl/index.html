@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Module 01: WebGL Graphics — Task 3.5 Procedural Study/Workspace PC Case</title>
+    <title>Module 01: WebGL Graphics — WebGL Graphics Playground</title>
     <link
       rel="icon"
       type="image/svg+xml"
@@ -14,207 +14,216 @@
   </head>
   <body>
     <main class="module-shell" aria-labelledby="module-title">
-      <!-- Top Instrument & Telemetry Bar (Diagnostics for Tasks 3.1 – 3.5) -->
+      <!-- Top Instrument & Telemetry Bar (Runtime Diagnostics) -->
       <header class="instrument-bar">
         <div class="instrument-identity">
-          <span class="module-badge">Module 01 · Task 3.5</span>
+          <span class="module-badge">Module 01</span>
           <h1 class="instrument-title" id="module-title">
-            Procedural 3D Study/Workspace PC Case &amp; Hierarchical MVP
+            WebGL Graphics Playground
           </h1>
         </div>
 
-        <ul class="telemetry-list" aria-label="WebGL runtime diagnostics">
-          <li>
-            <span
-              class="status-pill"
-              id="status-pill"
-              data-state="active"
-              role="status"
-              aria-live="polite"
+        <!-- Telemetry Container: Exactly Two Intentional Desktop Rows -->
+        <div class="telemetry-bar" aria-label="WebGL runtime diagnostics">
+          <!-- Row 1: WebGL Status & Rendering Configuration -->
+          <ul class="telemetry-row telemetry-row--config" aria-label="WebGL Status and Rendering Configuration">
+            <li class="telemetry-status-wrapper">
+              <span
+                class="status-pill"
+                id="status-pill"
+                data-state="active"
+                role="status"
+                aria-live="polite"
+              >
+                <span class="status-dot" aria-hidden="true"></span>
+                <span id="status-text">Initializing…</span>
+              </span>
+            </li>
+            <li class="telemetry-item" title="Canvas CSS layout dimensions in CSS pixels">
+              <span class="telemetry-label">CSS Size:</span>
+              <span class="telemetry-value" id="telemetry-css-size">0 × 0 px</span>
+            </li>
+            <li
+              class="telemetry-item"
+              title="WebGL GPU drawing-buffer dimensions in physical pixels"
             >
-              <span class="status-dot" aria-hidden="true"></span>
-              <span id="status-text">Initializing…</span>
-            </span>
-          </li>
-          <li class="telemetry-item" title="Canvas CSS layout dimensions in CSS pixels">
-            <span class="telemetry-label">CSS Size:</span>
-            <span class="telemetry-value" id="telemetry-css-size">0 × 0 px</span>
-          </li>
-          <li
-            class="telemetry-item"
-            title="WebGL GPU drawing-buffer dimensions in physical pixels"
-          >
-            <span class="telemetry-label">Drawing Buffer:</span>
-            <span class="telemetry-value" id="telemetry-buffer-size">0 × 0 px</span>
-          </li>
-          <li
-            class="telemetry-item"
-            title="Effective Device Pixel Ratio applied to drawing buffer"
-          >
-            <span class="telemetry-label">DPR:</span>
-            <span class="telemetry-value" id="telemetry-dpr">1.00×</span>
-          </li>
-          <li
-            class="telemetry-item"
-            title="Active scene draw calls, shared VBO vertex count, and EBO index count"
-          >
-            <span class="telemetry-label">Geometry:</span>
-            <span class="telemetry-value" id="telemetry-geometry">
-              13 parts · 24v · 36i
-            </span>
-          </li>
-          <li
-            class="telemetry-item"
-            title="Current root Euler rotation angles (rx, ry, rz) in degrees"
-          >
-            <span class="telemetry-label">Rotation:</span>
-            <span class="telemetry-value" id="telemetry-rotation">
-              (18°, -28°, 0°)
-            </span>
-          </li>
-          <li
-            class="telemetry-item"
-            title="Perspective projection vertical FOV and drawing-buffer aspect ratio"
-          >
-            <span class="telemetry-label">Camera:</span>
-            <span class="telemetry-value" id="telemetry-camera">
-              FOV 45° · Aspect 1.00
-            </span>
-          </li>
-          <li class="telemetry-item" title="Configured RGBA framebuffer clear color">
-            <span class="telemetry-label">Clear RGBA:</span>
-            <span class="telemetry-value" id="telemetry-clear-color">
-              (0.06, 0.11, 0.20, 1.00)
-            </span>
-          </li>
-          <li class="telemetry-item" title="Active requestAnimationFrame loop counter">
-            <span class="telemetry-label">Frames:</span>
-            <span class="telemetry-value" id="telemetry-frames">0</span>
-          </li>
-        </ul>
+              <span class="telemetry-label">Drawing Buffer:</span>
+              <span class="telemetry-value" id="telemetry-buffer-size">0 × 0 px</span>
+            </li>
+            <li
+              class="telemetry-item"
+              title="Effective Device Pixel Ratio applied to drawing buffer"
+            >
+              <span class="telemetry-label">DPR:</span>
+              <span class="telemetry-value" id="telemetry-dpr">1.00×</span>
+            </li>
+            <li
+              class="telemetry-item telemetry-item--geometry"
+              title="Active scene draw calls, shared VBO vertex count, and EBO index count"
+            >
+              <span class="telemetry-label">Geometry:</span>
+              <span class="telemetry-value" id="telemetry-geometry">
+                13 parts · 24v · 36i
+              </span>
+            </li>
+          </ul>
+
+          <!-- Row 2: Scene & Runtime Diagnostics -->
+          <ul class="telemetry-row telemetry-row--diagnostics" aria-label="Scene and Runtime Diagnostics">
+            <li
+              class="telemetry-item telemetry-item--rotation"
+              title="Current root Euler rotation angles (rx, ry, rz) in degrees"
+            >
+              <span class="telemetry-label">Rotation:</span>
+              <span class="telemetry-value telemetry-value--rotation" id="telemetry-rotation">
+                ( 18°,  -28°,   0°)
+              </span>
+            </li>
+            <li
+              class="telemetry-item telemetry-item--camera"
+              title="Perspective projection vertical FOV and drawing-buffer aspect ratio"
+            >
+              <span class="telemetry-label">Camera:</span>
+              <span class="telemetry-value" id="telemetry-camera">
+                FOV 45° · Aspect 1.00
+              </span>
+            </li>
+            <li class="telemetry-item telemetry-item--clear" title="Configured RGBA framebuffer clear color">
+              <span class="telemetry-label">Clear RGBA:</span>
+              <span class="telemetry-value" id="telemetry-clear-color">
+                (0.06, 0.11, 0.20, 1.00)
+              </span>
+            </li>
+            <li class="telemetry-item telemetry-item--frames" title="Active requestAnimationFrame loop counter">
+              <span class="telemetry-label">Frames:</span>
+              <span class="telemetry-value telemetry-value--frames" id="telemetry-frames">0</span>
+            </li>
+          </ul>
+        </div>
       </header>
 
-      <!-- Task 3.4 & 3.5 Compact Interactive Control Strip -->
+      <!-- Interactive Control Panel: Dedicated Two-Row Architecture -->
       <section
         class="control-panel"
         id="control-panel"
-        aria-label="3D scene, animation, and object controls"
+        aria-label="3D scene, animation, and appearance controls"
       >
-        <!-- Scene / Mesh Mode Selector (Task 3.5 PC Case vs. Task 3.3 Cube) -->
-        <div class="control-group">
-          <label class="control-label" for="control-mesh-mode">
-            Scene
-          </label>
-          <select
-            id="control-mesh-mode"
-            class="control-select"
-            aria-label="Select 3D scene model"
-          >
-            <option value="pccase" selected>PC Case (13 Cubes)</option>
-            <option value="cube">Reference Cube (Task 3.3)</option>
-            <option value="triangle">2D Triangle (Task 3.2)</option>
-          </select>
-        </div>
+        <!-- Row 1: Primary Controls Distributed Proportionally across Full Available Width -->
+        <div class="control-panel__primary">
+          <!-- 1. Scene Selection -->
+          <div class="control-item control-item--scene">
+            <label class="control-label" for="control-mesh-mode">
+              Scene
+            </label>
+            <select
+              id="control-mesh-mode"
+              class="control-select"
+              aria-label="Select 3D scene model"
+            >
+              <option value="pccase" selected>PC Case</option>
+              <option value="cube">Reference Cube</option>
+              <option value="triangle">2D Triangle</option>
+            </select>
+          </div>
 
-        <span class="control-divider" aria-hidden="true"></span>
+          <!-- 2. Auto-Rotate Checkbox Toggle -->
+          <div class="control-item control-item--toggle">
+            <label class="control-toggle" for="control-auto-rotate">
+              <input
+                type="checkbox"
+                id="control-auto-rotate"
+                class="control-checkbox"
+                checked
+              />
+              <span class="control-toggle-text">Auto-Rotate</span>
+              <span class="control-state-chip" id="control-auto-rotate-state">
+                On
+              </span>
+            </label>
+          </div>
 
-        <!-- A. Auto-Rotate Toggle -->
-        <div class="control-group">
-          <label class="control-toggle" for="control-auto-rotate">
+          <!-- 3. Rotation Speed Slider -->
+          <div class="control-item control-item--speed">
+            <label class="control-label" for="control-rotation-speed">
+              Speed
+            </label>
             <input
-              type="checkbox"
-              id="control-auto-rotate"
-              class="control-checkbox"
-              checked
+              type="range"
+              id="control-rotation-speed"
+              class="control-slider"
+              min="0"
+              max="180"
+              step="1"
+              value="45"
+              aria-describedby="control-speed-value"
             />
-            <span class="control-toggle-text">Auto-Rotate</span>
-            <span class="control-state-chip" id="control-auto-rotate-state">
-              On
-            </span>
-          </label>
+            <output
+              class="control-output"
+              id="control-speed-value"
+              for="control-rotation-speed"
+            >
+              45°/s
+            </output>
+          </div>
+
+          <!-- 4. Face / Part Target Select -->
+          <div class="control-item control-item--target">
+            <label class="control-label" for="control-color-target">
+              Target
+            </label>
+            <select
+              id="control-color-target"
+              class="control-select"
+              aria-label="Select component group or cube face for color update"
+            >
+              <option value="all" selected>All Parts / Faces</option>
+              <optgroup label="PC Case Component Groups">
+                <option value="chassis">Main Chassis &amp; Top</option>
+                <option value="front">Front Bezel &amp; Shroud</option>
+                <option value="side">Tempered Glass Side</option>
+                <option value="accent">RGB Accent &amp; Power LED</option>
+                <option value="details">Vents, I/O &amp; Feet</option>
+              </optgroup>
+              <optgroup label="Cube Faces">
+                <option value="0">Front (+Z)</option>
+                <option value="1">Back (-Z)</option>
+                <option value="2">Top (+Y)</option>
+                <option value="3">Bottom (-Y)</option>
+                <option value="4">Right (+X)</option>
+                <option value="5">Left (-X)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- 5. Object Color Picker -->
+          <div class="control-item control-item--color">
+            <label class="control-label" for="control-object-color">
+              Color
+            </label>
+            <input
+              type="color"
+              id="control-object-color"
+              class="control-color-input"
+              value="#384761"
+              aria-label="Object or face color picker"
+            />
+          </div>
+
+          <!-- 6. Default Palette Button -->
+          <div class="control-item control-item--palette">
+            <button
+              type="button"
+              id="control-color-palette"
+              class="control-btn control-btn--compact"
+              title="Restore default component colors and 6-face cube palette"
+            >
+              Default Palette
+            </button>
+          </div>
         </div>
 
-        <span class="control-divider" aria-hidden="true"></span>
-
-        <!-- B. Rotation Speed Slider (Degrees / Second) -->
-        <div class="control-group control-group--slider">
-          <label class="control-label" for="control-rotation-speed">
-            Speed
-          </label>
-          <input
-            type="range"
-            id="control-rotation-speed"
-            class="control-slider"
-            min="0"
-            max="180"
-            step="1"
-            value="45"
-            aria-describedby="control-speed-value"
-          />
-          <output
-            class="control-output"
-            id="control-speed-value"
-            for="control-rotation-speed"
-          >
-            45°/s
-          </output>
-        </div>
-
-        <span class="control-divider" aria-hidden="true"></span>
-
-        <!-- C. Component / Face Color Control -->
-        <div class="control-group">
-          <label class="control-label" for="control-color-target">
-            Target
-          </label>
-          <select
-            id="control-color-target"
-            class="control-select"
-            aria-label="Select PC case component group or cube face for color update"
-          >
-            <option value="all" selected>All Parts / Faces</option>
-            <optgroup label="PC Case Component Groups">
-              <option value="chassis">Main Chassis &amp; Top</option>
-              <option value="front">Front Bezel &amp; Shroud</option>
-              <option value="side">Tempered Glass Side</option>
-              <option value="accent">RGB Accent &amp; Power LED</option>
-              <option value="details">Vents, I/O &amp; Feet</option>
-            </optgroup>
-            <optgroup label="Cube Faces (Task 3.4)">
-              <option value="0">Front (+Z)</option>
-              <option value="1">Back (-Z)</option>
-              <option value="2">Top (+Y)</option>
-              <option value="3">Bottom (-Y)</option>
-              <option value="4">Right (+X)</option>
-              <option value="5">Left (-X)</option>
-            </optgroup>
-          </select>
-
-          <label class="control-label" for="control-object-color">
-            Color
-          </label>
-          <input
-            type="color"
-            id="control-object-color"
-            class="control-color-input"
-            value="#384761"
-            aria-label="Object or face color picker"
-          />
-
-          <button
-            type="button"
-            id="control-color-palette"
-            class="control-btn control-btn--compact"
-            title="Restore the default component colors and 6-face cube palette"
-          >
-            Default Palette
-          </button>
-        </div>
-
-        <span class="control-divider" aria-hidden="true"></span>
-
-        <!-- D. Pause / Resume Rendering & E. Reset to Defaults -->
-        <div class="control-group control-group--actions">
+        <!-- Row 2: Dedicated Actions Row Aligned to the Right on Desktop -->
+        <div class="control-panel__actions">
           <button
             type="button"
             id="control-pause-resume"
@@ -249,10 +258,10 @@
         <!-- Stage Verification Caption -->
         <div class="stage-caption" id="stage-caption" aria-hidden="true">
           <span class="stage-caption-title" id="stage-caption-title">
-            Composite 3D PC Case · 13 Draw Calls Reusing 1 Cube VAO (24v / 36i)
+            Composite PC Case · Shared Cube Geometry
           </span>
           <span class="stage-caption-text" id="stage-caption-text">
-            Hierarchical Transform: M_worldPart = M_root × M_localPart · Per-Part Uniforms
+            13 Draw Calls · Hierarchical Model Transforms
           </span>
         </div>
 

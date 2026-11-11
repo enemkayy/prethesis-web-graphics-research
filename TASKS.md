@@ -45,6 +45,7 @@
 - [x] Build a procedural composite 3D study/workspace object (desktop PC case) using reusable geometry and hierarchical transformations.
 - [x] Integrate the module into the Web Portal.
 - [x] Test browser compatibility and rendering behavior.
+- [x] Polish Module 1 UI/UX: clean titles, stable telemetry, control panel layout, and scene framing.
 
 ## Phase 4 – Module 2: Graphical Applications
 

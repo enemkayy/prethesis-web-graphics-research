@@ -52,16 +52,16 @@
         "status": "WebGL 2.0 Active",
         "bb": {
           "W": 1280,
-          "H": 593,
-          "litPixels": 57917,
+          "H": 594,
+          "litPixels": 83871,
           "bbox": [
-            493,
-            128,
-            741,
-            467
+            455,
+            95,
+            761,
+            500
           ],
-          "widthFrac": 0.19453125,
-          "heightFrac": 0.5733558178752108
+          "widthFrac": 0.23984375,
+          "heightFrac": 0.6835016835016835
         }
       },
       "status": "Passed"
@@ -77,9 +77,9 @@
         "ownRaf": 290,
         "stateFrames": 290,
         "ratio": 1,
-        "meanIntervalMs": 6.943944636678201,
-        "p95IntervalMs": 7.100000000000364,
-        "maxIntervalMs": 7.7999999999999545
+        "meanIntervalMs": 6.9439446366782,
+        "p95IntervalMs": 7.100000000000136,
+        "maxIntervalMs": 7.2999999999999545
       },
       "status": "Passed"
     },
@@ -112,7 +112,7 @@
           "draws": 1,
           "prim": "TRIANGLES"
         },
-        "caption": "gl.drawArrays(gl.TRIANGLES, 0, 3) · Attributes: a_position (loc 0), a_color (loc 1)",
+        "caption": "1 Draw Call (gl.drawArrays) · 3 Vertices · Barycentric Color Interpolation",
         "samples": [
           {
             "vertexColor": [
@@ -163,7 +163,7 @@
         "centre": [
           129,
           153,
-          161,
+          162,
           255
         ],
         "centreBlend": true
@@ -382,10 +382,10 @@
       "procedure": "Drive each control through its DOM element/event and verify diagnostics + rotation rate",
       "expected": "each control changes the matching state; rotation rate ≈ configured speed; pause freezes frameCount; resume restarts; reset restores defaults",
       "observed": {
-        "rate45": 45.08955223880554,
+        "rate45": 44.596881220913374,
         "speedState": 90,
         "speedLabel": "90°/s",
-        "rate90": 90.63756177924171,
+        "rate90": 89.85128883024893,
         "autoRotateOff": {
           "autoRotate": false,
           "angleDelta": 0,
@@ -572,12 +572,12 @@
           "frontBezelZ": -0.674
         },
         "loopRatio": {
-          "ownRaf": 217,
-          "stateFrames": 217,
+          "ownRaf": 218,
+          "stateFrames": 218,
           "ratio": 1,
-          "meanIntervalMs": 6.945370370370371,
-          "p95IntervalMs": 7.2000000000000455,
-          "maxIntervalMs": 7.2999999999999545
+          "meanIntervalMs": 6.944239631336405,
+          "p95IntervalMs": 7.099999999999909,
+          "maxIntervalMs": 7.2000000000000455
         }
       },
       "status": "Passed"
@@ -621,7 +621,7 @@
             0,
             1
           ],
-          "frontBezelZ": 0.606
+          "frontBezelZ": 0.609
         },
         "loopRatio": null
       },
@@ -693,12 +693,12 @@
       "procedure": "Stress calls then measure loopRatio over 2 s",
       "expected": "ratio ≈ 1.0; single animationFrameId",
       "observed": {
-        "ownRaf": 282,
-        "stateFrames": 282,
+        "ownRaf": 289,
+        "stateFrames": 289,
         "ratio": 1,
-        "meanIntervalMs": 7.141637010676155,
-        "p95IntervalMs": 7.199999999999989,
-        "maxIntervalMs": 20.90000000000009,
+        "meanIntervalMs": 6.944791666666667,
+        "p95IntervalMs": 7.099999999999909,
+        "maxIntervalMs": 7.699999999999818,
         "afId": true
       },
       "status": "Passed"
@@ -727,107 +727,107 @@
           {
             "vp": "1920x1080",
             "dpr": 1,
-            "css": "1920x948",
-            "buffer": "1920x948",
+            "css": "1920x874",
+            "buffer": "1920x874",
             "effDpr": 1,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.251
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.276
           },
           {
             "vp": "1440x900",
             "dpr": 1,
-            "css": "1440x693",
-            "buffer": "1440x693",
+            "css": "1440x694",
+            "buffer": "1440x694",
             "effDpr": 1,
-            "aspect": 2.0779,
-            "projAspect": 2.0779,
-            "instrumentBarH": 110,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 693,
+            "canvasStageH": 694,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.246
+            "pcCaseHeightFrac": 0.674,
+            "pcCaseWidthFrac": 0.293
           },
           {
             "vp": "1280x800",
             "dpr": 1,
-            "css": "1280x593",
-            "buffer": "1280x593",
+            "css": "1280x594",
+            "buffer": "1280x594",
             "effDpr": 1,
-            "aspect": 2.1585,
-            "projAspect": 2.1585,
-            "instrumentBarH": 110,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 593,
+            "canvasStageH": 594,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.565,
-            "pcCaseWidthFrac": 0.237
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.282
           },
           {
             "vp": "1024x768",
             "dpr": 1,
-            "css": "1024x561",
-            "buffer": "1024x561",
+            "css": "1024x518",
+            "buffer": "1024x518",
             "effDpr": 1,
-            "aspect": 1.8253,
-            "projAspect": 1.8253,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.278
+            "pcCaseHeightFrac": 0.674,
+            "pcCaseWidthFrac": 0.307
           },
           {
             "vp": "768x1024",
             "dpr": 1,
-            "css": "768x786",
-            "buffer": "768x786",
+            "css": "768x713",
+            "buffer": "768x713",
             "effDpr": 1,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
+            "aspect": 1.0771,
+            "projAspect": 1.0771,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.566,
-            "pcCaseWidthFrac": 0.522
+            "pcCaseHeightFrac": 0.677,
+            "pcCaseWidthFrac": 0.559
           },
           {
             "vp": "390x844",
             "dpr": 1,
-            "css": "390x506",
-            "buffer": "390x506",
+            "css": "390x434",
+            "buffer": "390x434",
             "effDpr": 1,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.662
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.674
           },
           {
             "vp": "375x667",
             "dpr": 1,
-            "css": "375x323",
-            "buffer": "375x323",
+            "css": "375x236",
+            "buffer": "375x236",
             "effDpr": 1,
-            "aspect": 1.161,
-            "projAspect": 1.161,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
+            "aspect": 1.589,
+            "projAspect": 1.589,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.44
+            "pcCaseHeightFrac": 0.674,
+            "pcCaseWidthFrac": 0.381
           },
           {
             "vp": "320x568",
@@ -837,117 +837,117 @@
             "effDpr": 1,
             "aspect": 1.7778,
             "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
             "canvasStageH": 180,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.287
+            "pcCaseHeightFrac": 0.672,
+            "pcCaseWidthFrac": 0.341
           },
           {
             "vp": "1920x1080",
             "dpr": 1.5,
-            "css": "1920x948",
-            "buffer": "2880x1422",
+            "css": "1920x874",
+            "buffer": "2880x1311",
             "effDpr": 1.5,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.568,
-            "pcCaseWidthFrac": 0.251
+            "pcCaseHeightFrac": 0.679,
+            "pcCaseWidthFrac": 0.273
           },
           {
             "vp": "1440x900",
             "dpr": 1.5,
-            "css": "1440x693",
-            "buffer": "2160x1040",
+            "css": "1440x694",
+            "buffer": "2160x1041",
             "effDpr": 1.5,
-            "aspect": 2.0769,
-            "projAspect": 2.0769,
-            "instrumentBarH": 110,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 693,
+            "canvasStageH": 694,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.244
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.29
           },
           {
             "vp": "1280x800",
             "dpr": 1.5,
-            "css": "1280x593",
-            "buffer": "1920x890",
+            "css": "1280x594",
+            "buffer": "1920x891",
             "effDpr": 1.5,
-            "aspect": 2.1573,
-            "projAspect": 2.1573,
-            "instrumentBarH": 110,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 593,
+            "canvasStageH": 594,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.57,
-            "pcCaseWidthFrac": 0.235
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.281
           },
           {
             "vp": "1024x768",
             "dpr": 1.5,
-            "css": "1024x561",
-            "buffer": "1536x842",
+            "css": "1024x518",
+            "buffer": "1536x777",
             "effDpr": 1.5,
-            "aspect": 1.8242,
-            "projAspect": 1.8242,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.28
+            "pcCaseHeightFrac": 0.674,
+            "pcCaseWidthFrac": 0.307
           },
           {
             "vp": "768x1024",
             "dpr": 1.5,
-            "css": "768x786",
-            "buffer": "1152x1179",
+            "css": "768x713",
+            "buffer": "1152x1070",
             "effDpr": 1.5,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
+            "aspect": 1.0766,
+            "projAspect": 1.0766,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.519
+            "pcCaseHeightFrac": 0.677,
+            "pcCaseWidthFrac": 0.561
           },
           {
             "vp": "390x844",
             "dpr": 1.5,
-            "css": "390x506",
-            "buffer": "585x759",
+            "css": "390x434",
+            "buffer": "585x651",
             "effDpr": 1.5,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.662
+            "pcCaseHeightFrac": 0.674,
+            "pcCaseWidthFrac": 0.675
           },
           {
             "vp": "375x667",
             "dpr": 1.5,
-            "css": "375x323",
-            "buffer": "563x485",
+            "css": "375x236",
+            "buffer": "563x354",
             "effDpr": 1.5,
-            "aspect": 1.1608,
-            "projAspect": 1.1608,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
+            "aspect": 1.5904,
+            "projAspect": 1.5904,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.44
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.382
           },
           {
             "vp": "320x568",
@@ -957,117 +957,117 @@
             "effDpr": 1.5,
             "aspect": 1.7778,
             "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
             "canvasStageH": 180,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.287
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.34
           },
           {
             "vp": "1920x1080",
             "dpr": 2,
-            "css": "1920x948",
-            "buffer": "3840x1896",
+            "css": "1920x874",
+            "buffer": "3840x1748",
             "effDpr": 2,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.25
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.269
           },
           {
             "vp": "1440x900",
             "dpr": 2,
-            "css": "1440x693",
-            "buffer": "2880x1386",
+            "css": "1440x694",
+            "buffer": "2880x1388",
             "effDpr": 2,
-            "aspect": 2.0779,
-            "projAspect": 2.0779,
-            "instrumentBarH": 110,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 693,
+            "canvasStageH": 694,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.243
+            "pcCaseHeightFrac": 0.676,
+            "pcCaseWidthFrac": 0.292
           },
           {
             "vp": "1280x800",
             "dpr": 2,
-            "css": "1280x593",
-            "buffer": "2560x1186",
+            "css": "1280x594",
+            "buffer": "2560x1188",
             "effDpr": 2,
-            "aspect": 2.1585,
-            "projAspect": 2.1585,
-            "instrumentBarH": 110,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 593,
+            "canvasStageH": 594,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.236
+            "pcCaseHeightFrac": 0.679,
+            "pcCaseWidthFrac": 0.278
           },
           {
             "vp": "1024x768",
             "dpr": 2,
-            "css": "1024x561",
-            "buffer": "2048x1122",
+            "css": "1024x518",
+            "buffer": "2048x1036",
             "effDpr": 2,
-            "aspect": 1.8253,
-            "projAspect": 1.8253,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.566,
-            "pcCaseWidthFrac": 0.279
+            "pcCaseHeightFrac": 0.677,
+            "pcCaseWidthFrac": 0.306
           },
           {
             "vp": "768x1024",
             "dpr": 2,
-            "css": "768x786",
-            "buffer": "1536x1572",
+            "css": "768x713",
+            "buffer": "1536x1426",
             "effDpr": 2,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
+            "aspect": 1.0771,
+            "projAspect": 1.0771,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.568,
-            "pcCaseWidthFrac": 0.52
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.563
           },
           {
             "vp": "390x844",
             "dpr": 2,
-            "css": "390x506",
-            "buffer": "780x1012",
+            "css": "390x434",
+            "buffer": "780x868",
             "effDpr": 2,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.566,
-            "pcCaseWidthFrac": 0.663
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.676
           },
           {
             "vp": "375x667",
             "dpr": 2,
-            "css": "375x323",
-            "buffer": "750x646",
+            "css": "375x236",
+            "buffer": "750x472",
             "effDpr": 2,
-            "aspect": 1.161,
-            "projAspect": 1.161,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
+            "aspect": 1.589,
+            "projAspect": 1.589,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.439
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.379
           },
           {
             "vp": "320x568",
@@ -1077,117 +1077,117 @@
             "effDpr": 2,
             "aspect": 1.7778,
             "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
             "canvasStageH": 180,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.569,
-            "pcCaseWidthFrac": 0.284
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.342
           },
           {
             "vp": "1920x1080",
             "dpr": 3,
-            "css": "1920x948",
-            "buffer": "3840x1896",
+            "css": "1920x874",
+            "buffer": "3840x1748",
             "effDpr": 2,
-            "aspect": 2.0253,
-            "projAspect": 2.0253,
-            "instrumentBarH": 79,
-            "controlPanelH": 53,
-            "canvasStageH": 948,
+            "aspect": 2.1968,
+            "projAspect": 2.1968,
+            "instrumentBarH": 109,
+            "controlPanelH": 97,
+            "canvasStageH": 874,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.568,
-            "pcCaseWidthFrac": 0.251
+            "pcCaseHeightFrac": 0.681,
+            "pcCaseWidthFrac": 0.27
           },
           {
             "vp": "1440x900",
             "dpr": 3,
-            "css": "1440x693",
-            "buffer": "2880x1386",
+            "css": "1440x694",
+            "buffer": "2880x1388",
             "effDpr": 2,
-            "aspect": 2.0779,
-            "projAspect": 2.0779,
-            "instrumentBarH": 110,
+            "aspect": 2.0749,
+            "projAspect": 2.0749,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 693,
+            "canvasStageH": 694,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.573,
-            "pcCaseWidthFrac": 0.238
+            "pcCaseHeightFrac": 0.676,
+            "pcCaseWidthFrac": 0.292
           },
           {
             "vp": "1280x800",
             "dpr": 3,
-            "css": "1280x593",
-            "buffer": "2560x1186",
+            "css": "1280x594",
+            "buffer": "2560x1188",
             "effDpr": 2,
-            "aspect": 2.1585,
-            "projAspect": 2.1585,
-            "instrumentBarH": 110,
+            "aspect": 2.1549,
+            "projAspect": 2.1549,
+            "instrumentBarH": 109,
             "controlPanelH": 97,
-            "canvasStageH": 593,
+            "canvasStageH": 594,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.236
+            "pcCaseHeightFrac": 0.679,
+            "pcCaseWidthFrac": 0.277
           },
           {
             "vp": "1024x768",
             "dpr": 3,
-            "css": "1024x561",
-            "buffer": "2048x1122",
+            "css": "1024x518",
+            "buffer": "2048x1036",
             "effDpr": 2,
-            "aspect": 1.8253,
-            "projAspect": 1.8253,
-            "instrumentBarH": 110,
-            "controlPanelH": 97,
-            "canvasStageH": 561,
+            "aspect": 1.9768,
+            "projAspect": 1.9768,
+            "instrumentBarH": 109,
+            "controlPanelH": 141,
+            "canvasStageH": 518,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.279
+            "pcCaseHeightFrac": 0.677,
+            "pcCaseWidthFrac": 0.306
           },
           {
             "vp": "768x1024",
             "dpr": 3,
-            "css": "768x786",
-            "buffer": "1536x1572",
+            "css": "768x713",
+            "buffer": "1536x1426",
             "effDpr": 2,
-            "aspect": 0.9771,
-            "projAspect": 0.9771,
-            "instrumentBarH": 141,
-            "controlPanelH": 97,
-            "canvasStageH": 786,
+            "aspect": 1.0771,
+            "projAspect": 1.0771,
+            "instrumentBarH": 170,
+            "controlPanelH": 141,
+            "canvasStageH": 713,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.568,
-            "pcCaseWidthFrac": 0.52
+            "pcCaseHeightFrac": 0.675,
+            "pcCaseWidthFrac": 0.563
           },
           {
             "vp": "390x844",
             "dpr": 3,
-            "css": "390x506",
-            "buffer": "780x1012",
+            "css": "390x434",
+            "buffer": "780x868",
             "effDpr": 2,
-            "aspect": 0.7708,
-            "projAspect": 0.7708,
-            "instrumentBarH": 159,
-            "controlPanelH": 179,
-            "canvasStageH": 506,
+            "aspect": 0.8986,
+            "projAspect": 0.8986,
+            "instrumentBarH": 147,
+            "controlPanelH": 263,
+            "canvasStageH": 434,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.662
+            "pcCaseHeightFrac": 0.674,
+            "pcCaseWidthFrac": 0.677
           },
           {
             "vp": "375x667",
             "dpr": 3,
-            "css": "375x323",
-            "buffer": "750x646",
+            "css": "375x236",
+            "buffer": "750x472",
             "effDpr": 2,
-            "aspect": 1.161,
-            "projAspect": 1.161,
-            "instrumentBarH": 159,
-            "controlPanelH": 185,
-            "canvasStageH": 323,
+            "aspect": 1.589,
+            "projAspect": 1.589,
+            "instrumentBarH": 168,
+            "controlPanelH": 263,
+            "canvasStageH": 236,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.568,
-            "pcCaseWidthFrac": 0.439
+            "pcCaseHeightFrac": 0.674,
+            "pcCaseWidthFrac": 0.383
           },
           {
             "vp": "320x568",
@@ -1197,12 +1197,12 @@
             "effDpr": 2,
             "aspect": 1.7778,
             "projAspect": 1.7778,
-            "instrumentBarH": 183,
-            "controlPanelH": 215,
+            "instrumentBarH": 189,
+            "controlPanelH": 263,
             "canvasStageH": 180,
             "controlsOutsideViewport": [],
-            "pcCaseHeightFrac": 0.567,
-            "pcCaseWidthFrac": 0.287
+            "pcCaseHeightFrac": 0.678,
+            "pcCaseWidthFrac": 0.341
           }
         ]
       },
@@ -1219,128 +1219,128 @@
         {
           "css": [
             1920,
-            948
+            874
           ],
           "buf": [
             1920,
-            948
+            874
           ],
           "vp": [
             0,
             0,
             1920,
-            948
+            874
           ],
           "aspectErr": 0,
-          "lit": 157858
+          "lit": 187919
         },
         {
           "css": [
             1440,
-            693
+            694
           ],
           "buf": [
             1440,
-            693
+            694
           ],
           "vp": [
             0,
             0,
             1440,
-            693
+            694
           ],
           "aspectErr": 0,
-          "lit": 75068
+          "lit": 102432
         },
         {
           "css": [
             1280,
-            593
+            594
           ],
           "buf": [
             1280,
-            593
+            594
           ],
           "vp": [
             0,
             0,
             1280,
-            593
+            594
           ],
           "aspectErr": 0,
-          "lit": 44376
+          "lit": 61873
         },
         {
           "css": [
             1024,
-            561
+            518
           ],
           "buf": [
             1024,
-            561
+            518
           ],
           "vp": [
             0,
             0,
             1024,
-            561
+            518
           ],
           "aspectErr": 0,
-          "lit": 40491
+          "lit": 52267
         },
         {
           "css": [
             768,
-            786
+            713
           ],
           "buf": [
             768,
-            786
+            713
           ],
           "vp": [
             0,
             0,
             768,
-            786
+            713
           ],
           "aspectErr": 0,
-          "lit": 97514
+          "lit": 118357
         },
         {
           "css": [
             390,
-            506
+            434
           ],
           "buf": [
             390,
-            506
+            434
           ],
           "vp": [
             0,
             0,
             390,
-            506
+            434
           ],
           "aspectErr": 0,
-          "lit": 45211
+          "lit": 47794
         },
         {
           "css": [
             375,
-            323
+            236
           ],
           "buf": [
             375,
-            323
+            236
           ],
           "vp": [
             0,
             0,
             375,
-            323
+            236
           ],
           "aspectErr": 0,
-          "lit": 18959
+          "lit": 14427
         },
         {
           "css": [
@@ -1358,25 +1358,25 @@
             180
           ],
           "aspectErr": 0,
-          "lit": 5988
+          "lit": 8554
         },
         {
           "css": [
             1280,
-            593
+            594
           ],
           "buf": [
             1280,
-            593
+            594
           ],
           "vp": [
             0,
             0,
             1280,
-            593
+            594
           ],
           "aspectErr": 0,
-          "lit": 63558
+          "lit": 90594
         }
       ],
       "status": "Passed"
@@ -1391,30 +1391,30 @@
       "observed": [
         {
           "vp": "390x844",
-          "instrumentBarH": 159,
-          "controlPanelH": 179,
-          "canvasH": 506,
-          "canvasFracOfViewport": 0.6,
+          "instrumentBarH": 147,
+          "controlPanelH": 263,
+          "canvasH": 434,
+          "canvasFracOfViewport": 0.514,
           "controlsOutsideViewport": [],
-          "pcCaseHeightFracOfCanvas": 0.569
+          "pcCaseHeightFracOfCanvas": 0.675
         },
         {
           "vp": "375x667",
-          "instrumentBarH": 159,
-          "controlPanelH": 185,
-          "canvasH": 323,
-          "canvasFracOfViewport": 0.484,
+          "instrumentBarH": 168,
+          "controlPanelH": 263,
+          "canvasH": 236,
+          "canvasFracOfViewport": 0.354,
           "controlsOutsideViewport": [],
-          "pcCaseHeightFracOfCanvas": 0.567
+          "pcCaseHeightFracOfCanvas": 0.674
         },
         {
           "vp": "320x568",
-          "instrumentBarH": 183,
-          "controlPanelH": 215,
+          "instrumentBarH": 189,
+          "controlPanelH": 263,
           "canvasH": 180,
           "canvasFracOfViewport": 0.317,
           "controlsOutsideViewport": [],
-          "pcCaseHeightFracOfCanvas": 0.567
+          "pcCaseHeightFracOfCanvas": 0.672
         }
       ],
       "status": "Passed"
@@ -1437,13 +1437,13 @@
         "draws": 13,
         "canvas": [
           1094,
-          341,
+          342,
           1094,
-          341
+          342
         ],
         "timing": {
           "loadAtMsAfterScript": 0,
-          "firstFramesAtMs": 55
+          "firstFramesAtMs": 56
         }
       },
       "status": "Passed"
@@ -1466,14 +1466,14 @@
           "overlayErrorHidden": true,
           "hash": "#/module1",
           "hasWebGL2": true,
-          "frameCount": 65,
+          "frameCount": 66,
           "status": "WebGL 2.0 Active",
           "draws": 13,
           "canvas": [
             1094,
-            341,
+            342,
             1094,
-            341
+            342
           ]
         }
       },
@@ -1520,7 +1520,7 @@
       "expected": "iframe reloads (new window object, frameCount restarts, compile=1), WebGL active, single loop",
       "observed": {
         "newDocIsDifferent": true,
-        "framesBefore": 295,
+        "framesBefore": 298,
         "compiles": 1,
         "draws": 13,
         "loopRatio": 1,
@@ -1542,7 +1542,7 @@
         "whileHidden": {
           "hash": "#/",
           "moduleViewHidden": true,
-          "framesWhileHidden": 145,
+          "framesWhileHidden": 144,
           "canvasWhileHidden": [
             1,
             1,
@@ -1555,12 +1555,12 @@
         "afterReturn": {
           "canvas": [
             1094,
-            341,
+            342,
             1094,
-            341
+            342
           ],
-          "litPixels": 19511,
-          "bboxHeightFrac": 0.513,
+          "litPixels": 28205,
+          "bboxHeightFrac": 0.623,
           "loopRatio": 1,
           "newDocument": 1
         }
@@ -1579,43 +1579,43 @@
           "collapsed": false,
           "canvasCss": [
             1094,
-            341
+            342
           ],
           "buffer": [
             1094,
-            341
+            342
           ],
-          "aspectBuffer": 3.2082,
-          "aspectProj": 3.2082,
-          "lit": 19449
+          "aspectBuffer": 3.1988,
+          "aspectProj": 3.1988,
+          "lit": 28078
         },
         "collapsed": {
           "collapsed": true,
           "canvasCss": [
             1302,
-            341
+            342
           ],
           "buffer": [
             1302,
-            341
+            342
           ],
-          "aspectBuffer": 3.8182,
-          "aspectProj": 3.8182,
-          "lit": 21481
+          "aspectBuffer": 3.807,
+          "aspectProj": 3.807,
+          "lit": 30515
         },
         "expandedAgain": {
           "collapsed": false,
           "canvasCss": [
             1094,
-            341
+            342
           ],
           "buffer": [
             1094,
-            341
+            342
           ],
-          "aspectBuffer": 3.2082,
-          "aspectProj": 3.2082,
-          "lit": 21065
+          "aspectBuffer": 3.1988,
+          "aspectProj": 3.1988,
+          "lit": 30401
         }
       },
       "status": "Passed"
@@ -1637,13 +1637,13 @@
           356,
           180
         ],
-        "lit": 4009,
-        "pcCaseHeightFrac": 0.556,
+        "lit": 6384,
+        "pcCaseHeightFrac": 0.672,
         "layoutInsideIframe": {
           "innerW": 356,
           "innerH": 440,
-          "instrumentBarH": 159,
-          "controlPanelH": 185,
+          "instrumentBarH": 168,
+          "controlPanelH": 263,
           "canvasStageH": 180,
           "hScrollOverflowPx": 0,
           "controlsOutsideViewport": []
@@ -1673,9 +1673,9 @@
         "draws": 13,
         "canvas": [
           1094,
-          341,
+          342,
           1094,
-          341
+          342
         ]
       },
       "status": "Passed"
@@ -1696,14 +1696,14 @@
           ],
           "canvasCss": [
             1574,
-            565
+            522
           ],
           "buffer": [
             1574,
-            565
+            522
           ],
-          "lit": 44759,
-          "pcCaseHeightFrac": 0.565,
+          "lit": 53847,
+          "pcCaseHeightFrac": 0.669,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1715,14 +1715,14 @@
           ],
           "canvasCss": [
             1094,
-            341
+            342
           ],
           "buffer": [
             1094,
-            341
+            342
           ],
-          "lit": 14839,
-          "pcCaseHeightFrac": 0.557,
+          "lit": 22057,
+          "pcCaseHeightFrac": 0.67,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1734,14 +1734,14 @@
           ],
           "canvasCss": [
             919,
-            302
+            260
           ],
           "buffer": [
             919,
-            302
+            260
           ],
-          "lit": 15190,
-          "pcCaseHeightFrac": 0.576,
+          "lit": 16344,
+          "pcCaseHeightFrac": 0.685,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1752,15 +1752,15 @@
             540
           ],
           "canvasCss": [
-            663,
-            285
+            648,
+            200
           ],
           "buffer": [
-            663,
-            285
+            648,
+            200
           ],
-          "lit": 14754,
-          "pcCaseHeightFrac": 0.568,
+          "lit": 10344,
+          "pcCaseHeightFrac": 0.675,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1772,14 +1772,14 @@
           ],
           "canvasCss": [
             718,
-            407
+            229
           ],
           "buffer": [
             718,
-            407
+            229
           ],
-          "lit": 30320,
-          "pcCaseHeightFrac": 0.545,
+          "lit": 13761,
+          "pcCaseHeightFrac": 0.642,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1797,8 +1797,8 @@
             356,
             180
           ],
-          "lit": 5979,
-          "pcCaseHeightFrac": 0.511,
+          "lit": 8447,
+          "pcCaseHeightFrac": 0.6,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1816,8 +1816,8 @@
             341,
             180
           ],
-          "lit": 5727,
-          "pcCaseHeightFrac": 0.511,
+          "lit": 7976,
+          "pcCaseHeightFrac": 0.617,
           "hOverflow": 0,
           "controlsOutside": []
         },
@@ -1835,8 +1835,8 @@
             286,
             180
           ],
-          "lit": 4858,
-          "pcCaseHeightFrac": 0.517,
+          "lit": 6720,
+          "pcCaseHeightFrac": 0.628,
           "hOverflow": 0,
           "controlsOutside": []
         }
@@ -1869,14 +1869,14 @@
           "eboBytes": 0,
           "buffer": [
             1280,
-            593
+            594
           ],
-          "rafMeanIntervalMs": 6.94,
+          "rafMeanIntervalMs": 6.96,
           "rafP95IntervalMs": 7.1,
-          "rafMaxIntervalMs": 7.6,
-          "framesIn3s": 434,
-          "cpuUpdateSubmitMsPerFrame": 0.024,
-          "cpuSubmitPlusReadPixelsMsPerFrame": 2.732
+          "rafMaxIntervalMs": 13.8,
+          "framesIn3s": 432,
+          "cpuUpdateSubmitMsPerFrame": 0.037,
+          "cpuSubmitPlusReadPixelsMsPerFrame": 3.549
         },
         "cube": {
           "drawCalls": 1,
@@ -1886,14 +1886,14 @@
           "eboBytes": 72,
           "buffer": [
             1280,
-            593
+            594
           ],
           "rafMeanIntervalMs": 6.94,
           "rafP95IntervalMs": 7.1,
-          "rafMaxIntervalMs": 7.7,
-          "framesIn3s": 433,
-          "cpuUpdateSubmitMsPerFrame": 0.069,
-          "cpuSubmitPlusReadPixelsMsPerFrame": 3.471
+          "rafMaxIntervalMs": 7.6,
+          "framesIn3s": 434,
+          "cpuUpdateSubmitMsPerFrame": 0.095,
+          "cpuSubmitPlusReadPixelsMsPerFrame": 4.406
         },
         "pccase": {
           "drawCalls": 13,
@@ -1903,29 +1903,29 @@
           "eboBytes": 72,
           "buffer": [
             1280,
-            593
+            594
           ],
-          "rafMeanIntervalMs": 6.94,
+          "rafMeanIntervalMs": 6.96,
           "rafP95IntervalMs": 7.1,
-          "rafMaxIntervalMs": 7.3,
+          "rafMaxIntervalMs": 13.8,
           "framesIn3s": 433,
-          "cpuUpdateSubmitMsPerFrame": 0.059,
-          "cpuSubmitPlusReadPixelsMsPerFrame": 3.429
+          "cpuUpdateSubmitMsPerFrame": 0.085,
+          "cpuSubmitPlusReadPixelsMsPerFrame": 4.17
         },
         "timerQuery": {
           "available": true,
           "out": [
             {
               "mode": "triangle",
-              "gpuNs": 333906
+              "gpuNs": 332135
             },
             {
               "mode": "cube",
-              "gpuNs": 316822
+              "gpuNs": 367031
             },
             {
               "mode": "pccase",
-              "gpuNs": 373645
+              "gpuNs": 397082
             }
           ]
         }
@@ -1944,15 +1944,15 @@
         "out": [
           {
             "mode": "triangle",
-            "gpuNs": 333906
+            "gpuNs": 332135
           },
           {
             "mode": "cube",
-            "gpuNs": 316822
+            "gpuNs": 367031
           },
           {
             "mode": "pccase",
-            "gpuNs": 373645
+            "gpuNs": 397082
           }
         ]
       },
